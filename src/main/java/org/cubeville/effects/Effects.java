@@ -20,6 +20,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.cubeville.commons.commands.CommandParser;
+import org.cubeville.cvtools.CVTools;
 import org.cubeville.effects.commands.*;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.managers.EventListener;
@@ -224,5 +225,6 @@ public class Effects extends JavaPlugin {
         commandParser.addCommand(new PermissionRemoveCommand());
         commandParser.addCommand(new EffectCreateSpawnFrogWithLivingEntityCommand());
         commandParser.addCommand(new GenerateParticleCoordsCommand());
+        CVTools.getInstance().registerCommandParser("fx", "fx.admin", commandParser);
     }
 }

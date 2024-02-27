@@ -19,16 +19,18 @@ public class EffectListCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) {
-        player.sendMessage("--- Effect List ---");
+
+        CommandResponse response = new CommandResponse("--- Effect List ---");
+
         List<String> effects = EffectManager.getInstance().getEffectList();
         Collections.sort(effects);
         String filter = ((String) baseParameters.get(0)).toUpperCase();
         for(String e: effects) {
             if(filter.equals("ALL") || e.toUpperCase().indexOf(filter) >= 0) {
-                player.sendMessage(e);
+                response.addMessage(e);
             }
         }
-        return null;
-    }
 
+        return response;
+    }
 }
