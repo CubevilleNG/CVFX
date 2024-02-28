@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.bukkit.World;
-import org.bukkit.Chunk;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.entity.ArmorStand;
@@ -32,7 +31,7 @@ import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
 
-import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 
 import org.cubeville.effects.pluginhook.PluginHookManager;
 
