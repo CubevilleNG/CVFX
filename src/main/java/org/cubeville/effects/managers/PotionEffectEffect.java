@@ -3,19 +3,20 @@ package org.cubeville.effects.managers;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.potion.PotionEffectType;
 
-@SerializableAs("PotionEffect")
-public class PotionEffect extends EffectWithLivingEntity
+@SerializableAs("PotionEffectEffect")
+public class PotionEffectEffect extends EffectWithLivingEntity
 {
     PotionEffectType effectType;
     int duration;
     int amplifier;
     
-    public PotionEffect(String name, PotionEffectType effectType, int duration, int amplifier) {
+    public PotionEffectEffect(String name, PotionEffectType effectType, int duration, int amplifier) {
         setName(name);
         this.effectType = effectType;
         this.duration = duration;
@@ -34,7 +35,7 @@ public class PotionEffect extends EffectWithLivingEntity
         System.out.println("EFFECT TYPE: " + effectType);
     }
 
-    public PotionEffect(Map<String, Object> config) {
+    public PotionEffectEffect(Map<String, Object> config) {
         this.effectType = PotionEffectType.getByName((String) config.get("effecttype"));
         this.duration = (int) config.get("duration");
         this.amplifier = (int) config.get("amplifier");
@@ -56,7 +57,7 @@ public class PotionEffect extends EffectWithLivingEntity
     }
 
     public void play(LivingEntity entity, Event event) {
-        entity.addPotionEffect(new org.bukkit.potion.PotionEffect(effectType, duration, amplifier));
+        entity.addPotionEffect(new PotionEffect(effectType, duration, amplifier));
     }
 
     public String getType() {

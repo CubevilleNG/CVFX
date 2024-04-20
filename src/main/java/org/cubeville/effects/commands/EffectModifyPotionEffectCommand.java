@@ -13,15 +13,13 @@ import org.cubeville.commons.commands.CommandParameterInteger;
 import org.cubeville.commons.commands.CommandParameterPotionEffectType;
 import org.cubeville.commons.commands.CommandResponse;
 
-import org.cubeville.effects.managers.ParticleEffect;
-import org.cubeville.effects.managers.ParticleEffectComponent;
-import org.cubeville.effects.managers.PotionEffect;
+import org.cubeville.effects.managers.PotionEffectEffect;
 
 public class EffectModifyPotionEffectCommand extends Command {
 
     public EffectModifyPotionEffectCommand() {
         super("effect modify");
-        addBaseParameter(new CommandParameterEffect(PotionEffect.class));
+        addBaseParameter(new CommandParameterEffect(PotionEffectEffect.class));
         addBaseParameter(new CommandParameterPotionEffectType());
         addBaseParameter(new CommandParameterInteger());
         addBaseParameter(new CommandParameterInteger());
@@ -30,7 +28,7 @@ public class EffectModifyPotionEffectCommand extends Command {
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters)
     throws CommandExecutionException {
 
-        PotionEffect effect = (PotionEffect) baseParameters.get(0);
+        PotionEffectEffect effect = (PotionEffectEffect) baseParameters.get(0);
         effect.modify((PotionEffectType) baseParameters.get(1),
                       (Integer) baseParameters.get(3),
                       (Integer) baseParameters.get(2));

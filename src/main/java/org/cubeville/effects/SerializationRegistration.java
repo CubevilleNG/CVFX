@@ -31,7 +31,7 @@ public class SerializationRegistration
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.ParticleEffectComponent.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.ParticleEffectTimelineEntry.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.PiercingEffect.class);
-        ConfigurationSerialization.registerClass(org.cubeville.effects.managers.PotionEffect.class);
+        ConfigurationSerialization.registerClass(org.cubeville.effects.managers.PotionEffectEffect.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.SoundEffect.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.modifier.CoordinateModifierMove.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.modifier.CoordinateModifierRotate.class);
