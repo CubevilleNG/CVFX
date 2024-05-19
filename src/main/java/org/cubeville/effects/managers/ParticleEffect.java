@@ -136,6 +136,8 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                     int effectStep = localStep - component.getEffectOffset(timelineNo);
                                             
                     Location location = locationCalculator.getLocationForStep(step - component.getLocationOffset(timelineNo));
+                    if(location == null) continue;
+                    
                     List<Vector> particleLocations = component.getModifiedCoordinates(effectStep, false);
 
                     if(component.isArmorStandActive() && particleLocations.size() > 0) {

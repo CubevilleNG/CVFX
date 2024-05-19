@@ -57,7 +57,7 @@ public class ParticlePlayerCommand extends BaseCommand
         World world = Bukkit.getWorld(worldName);
         if(world == null) throw new CommandExecutionException("World " + world + " does not exist!");
         Location loc = new Location(world, location.getX(), location.getY(), location.getZ(), yaw, pitch);
-        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false).runTaskTimer(Effects.getInstance(), 1, 1);
+        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false).runTaskTimer(Effects.getInstance(), 1, 1);
 
 	if(flags.contains("silent")) {
 	    return new CommandResponse("");

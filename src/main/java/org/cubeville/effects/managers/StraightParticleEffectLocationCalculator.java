@@ -15,7 +15,13 @@ public class StraightParticleEffectLocationCalculator implements ParticleEffectL
     private Player player;
     private Location initialPlayerLocation;
 
-    StraightParticleEffectLocationCalculator(Location location, double speed, Player player, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch) {
+    private Location lastPlayerLocation;
+    boolean playerMoving = false;
+    private int lastPlayerLocationStep = 0;
+    private boolean disableWhenMoving;
+    private boolean disableWhenStill;
+    
+    StraightParticleEffectLocationCalculator(Location location, double speed, Player player, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill) {
         this.speed = speed;
         this.location = location;
         this.player = player;
@@ -23,10 +29,29 @@ public class StraightParticleEffectLocationCalculator implements ParticleEffectL
         this.followPlayerLocation = followPlayerLocation;
         this.followPlayerYaw = followPlayerYaw;
         this.followPlayerPitch = followPlayerPitch;
+        if(player != null) {
+            lastPlayerLocation = player.getLocation();
+            this.disableWhenMoving = disableWhenMoving;
+            this.disableWhenStill = disableWhenStill;
+        }
+        else {
+            this.disableWhenMoving = false;
+            this.disableWhenStill = false;
+        }
     }
 
     public Location getLocationForStep(int step) {
         Location nloc = location.clone();
+
+        if(step != lastPlayerLocationStep) {
+            playerMoving = player.getLocation().distance(lastPlayerLocation) >= 0.1;
+            lastPlayerLocation = player.getLocation();
+            lastPlayerLocationStep = step;
+        }
+
+        if(disableWhenMoving == true && playerMoving == true) return null;
+        if(disableWhenStill == true && playerMoving == false) return null;
+
         if(followPlayerLocation) {
             nloc.setX(nloc.getX() + player.getLocation().getX() - initialPlayerLocation.getX());
             nloc.setY(nloc.getY() + player.getLocation().getY() - initialPlayerLocation.getY());

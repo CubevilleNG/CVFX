@@ -18,10 +18,10 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
     private ParticleEffectLocationCalculator locationCalculator;
     private final int runningEffectId;
 
-    public ParticleEffectTimedRunnable(JavaPlugin plugin, Player player, ParticleEffect effect, double stepsPerTick, double speed, Location location, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch)
+    public ParticleEffectTimedRunnable(JavaPlugin plugin, Player player, ParticleEffect effect, double stepsPerTick, double speed, Location location, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill)
     {
         runningEffectId = EffectManager.getNewRunningEffectId();
-        locationCalculator = new StraightParticleEffectLocationCalculator(location, speed, player, followPlayerLocation, followPlayerYaw, followPlayerPitch);
+        locationCalculator = new StraightParticleEffectLocationCalculator(location, speed, player, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill);
 	this.plugin = plugin;
 	this.effect = effect;
 	this.stepsPerTick = stepsPerTick;
