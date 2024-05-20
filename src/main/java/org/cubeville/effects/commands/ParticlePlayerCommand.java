@@ -10,6 +10,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.util.Vector;
 
+import org.cubeville.commons.commands.CommandParameterInteger;
 import org.cubeville.commons.commands.BaseCommand;
 import org.cubeville.commons.commands.CommandExecutionException;
 import org.cubeville.commons.commands.CommandParameterDouble;
@@ -35,6 +36,7 @@ public class ParticlePlayerCommand extends BaseCommand
         addBaseParameter(new CommandParameterVector()); // location
         addBaseParameter(new CommandParameterDouble()); // yaw
         addBaseParameter(new CommandParameterDouble()); // pitch
+        addParameter("stopat", true, new CommandParameterInteger());
 	addFlag("silent");
     }
 
@@ -57,7 +59,12 @@ public class ParticlePlayerCommand extends BaseCommand
         World world = Bukkit.getWorld(worldName);
         if(world == null) throw new CommandExecutionException("World " + world + " does not exist!");
         Location loc = new Location(world, location.getX(), location.getY(), location.getZ(), yaw, pitch);
-        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false).runTaskTimer(Effects.getInstance(), 1, 1);
+
+        int stopat = 0;
+        if(parameters.containsKey("stopat"))
+            stopat = (int) parameters.get("stopat");
+        
+        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopat).runTaskTimer(Effects.getInstance(), 1, 1);
 
 	if(flags.contains("silent")) {
 	    return new CommandResponse("");

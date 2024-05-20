@@ -98,7 +98,7 @@ public class InteractHookTargetLocationParticlePlayer implements InteractHook
             loc.setDirection(dir);
         }
         if(fixedPitch) loc.setPitch((float)pitch);
-        new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, false, false, false, false, false).runTaskTimer(Effects.getInstance(), 1, 1);
+        new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, false, false, false, false, false, 0).runTaskTimer(Effects.getInstance(), 1, 1);
         return !targetFoundStopsProcessing;
     }
 
@@ -110,6 +110,6 @@ public class InteractHookTargetLocationParticlePlayer implements InteractHook
         return false;
     }
 
-    public void playAt(Location location) {}
-    
+    public void playAt(Location location, int stopAt) {}
+    public void playFor(Player player, int stopAt) {}
 }

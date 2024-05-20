@@ -68,6 +68,8 @@ public class InteractHookParticlePlayer implements InteractHook
             disableWhenStill = (boolean) config.get("disableWhenStill");
         else
             disableWhenStill = false;
+
+        
     }
     
     public Map<String, Object> serialize() {
@@ -105,19 +107,23 @@ public class InteractHookParticlePlayer implements InteractHook
     public boolean process(PlayerInteractEvent rawEvent) {
         PlayerInteractEvent event = (PlayerInteractEvent) rawEvent;
         Player player = event.getPlayer();
+        playFor(player, 0);
+        return true;
+    }
+
+    public void playFor(Player player, int stopAt) {
 	Location loc = player.getLocation().clone();
 	loc.setY(loc.getY() + yOffset);
         if(player.isSneaking()) loc.setY(loc.getY() + ySneakShift);
 	if(fixedPitch) loc.setPitch((float)pitch);
-	new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill).runTaskTimer(Effects.getInstance(), 1, 1);
-        return true;
+	new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill, stopAt).runTaskTimer(Effects.getInstance(), 1, 1);
     }
-
-    public void playAt(Location location) {
+    
+    public void playAt(Location location, int stopAt) {
         Location loc = location.clone();
         loc.setY(loc.getY() + yOffset);
         if(fixedPitch) loc.setPitch((float)pitch);
-	new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false).runTaskTimer(Effects.getInstance(), 1, 1);
+	new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopAt).runTaskTimer(Effects.getInstance(), 1, 1);
     }
     
     public boolean usesEffect(Effect effect) {

@@ -17,8 +17,9 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
     private Player player;
     private ParticleEffectLocationCalculator locationCalculator;
     private final int runningEffectId;
-
-    public ParticleEffectTimedRunnable(JavaPlugin plugin, Player player, ParticleEffect effect, double stepsPerTick, double speed, Location location, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill)
+    private final int stopAt;
+    
+    public ParticleEffectTimedRunnable(JavaPlugin plugin, Player player, ParticleEffect effect, double stepsPerTick, double speed, Location location, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, int stopAt)
     {
         runningEffectId = EffectManager.getNewRunningEffectId();
         locationCalculator = new StraightParticleEffectLocationCalculator(location, speed, player, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill);
@@ -26,6 +27,7 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
 	this.effect = effect;
 	this.stepsPerTick = stepsPerTick;
         this.player = player;
+        this.stopAt = stopAt;
 	ticks = 0;
 	step = 0;
     }
@@ -33,6 +35,11 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
     @Override
     public void run() {
 	ticks++;
+        if(stopAt > 0 && ticks >= stopAt) {
+            this.cancel();
+            return;
+        }
+        
 	while(step + 1 < ticks * stepsPerTick) {
             if(!effect.play(step++, locationCalculator, player, runningEffectId)) {
                 this.cancel();

@@ -3,6 +3,7 @@ package org.cubeville.effects.hooks;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -54,11 +55,11 @@ public class InteractHookPlayerLocation implements InteractHook
 
     public boolean process(PlayerInteractEvent event) {
         Location loc = event.getPlayer().getLocation();
-        playAt(loc);
+        playAt(loc, 0);
         return true;
     }
 
-    public void playAt(Location location) {
+    public void playAt(Location location, int stopAt) {
         Location loc = location.clone();
         if(fixedPitch) loc.setPitch(0);
         loc.setY(loc.getY() + yoffset);
@@ -66,6 +67,10 @@ public class InteractHookPlayerLocation implements InteractHook
 	effect.play(loc);
     }
 
+    public void playFor(Player player, int stopAt) {
+        playAt(player.getLocation(), stopAt);
+    }
+    
     public boolean usesEffect(Effect effect) {
         return effect == this.effect;
     }

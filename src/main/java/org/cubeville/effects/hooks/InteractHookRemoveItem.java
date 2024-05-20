@@ -3,6 +3,7 @@ package org.cubeville.effects.hooks;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.entity.Player;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -38,5 +39,6 @@ public class InteractHookRemoveItem implements InteractHook
         return false;
     }
 
-    public void playAt(Location location) {}
+    public void playAt(Location location, int stopAt) {}
+    public void playFor(Player player, int stopAt) {}
 }
