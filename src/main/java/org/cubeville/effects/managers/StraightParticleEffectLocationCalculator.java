@@ -15,9 +15,7 @@ public class StraightParticleEffectLocationCalculator implements ParticleEffectL
     private Player player;
     private Location initialPlayerLocation;
 
-    private Location lastPlayerLocation;
-    boolean playerMoving = false;
-    private int lastPlayerLocationStep = 0;
+    private boolean playerMoving = false;
     private boolean disableWhenMoving;
     private boolean disableWhenStill;
     
@@ -30,7 +28,6 @@ public class StraightParticleEffectLocationCalculator implements ParticleEffectL
         this.followPlayerYaw = followPlayerYaw;
         this.followPlayerPitch = followPlayerPitch;
         if(player != null) {
-            lastPlayerLocation = player.getLocation();
             this.disableWhenMoving = disableWhenMoving;
             this.disableWhenStill = disableWhenStill;
         }
@@ -43,12 +40,8 @@ public class StraightParticleEffectLocationCalculator implements ParticleEffectL
     public Location getLocationForStep(int step) {
         Location nloc = location.clone();
 
-        if(step != lastPlayerLocationStep) {
-            playerMoving = player.getLocation().distance(lastPlayerLocation) >= 0.1;
-            lastPlayerLocation = player.getLocation();
-            lastPlayerLocationStep = step;
-        }
-
+        playerMoving = System.currentTimeMillis() - EventListener.getInstance().getLastPlayerMoveTime(player.getUniqueId()) < 400;
+        
         if(disableWhenMoving == true && playerMoving == true) return null;
         if(disableWhenStill == true && playerMoving == false) return null;
 
