@@ -27,6 +27,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
     private EffectWithLocation externalEffect;
 
     private ArmorStandProperties armorStandProperties;
+    private DisplayEntityProperties displayEntityProperties;
     
     private ValueSource count;
     private ValueSource spreadX;
@@ -62,6 +63,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         blockCollisionCheck = false;
         entityCollisionCheck = false;
         armorStandProperties = null;
+        displayEntityProperties = null;
     }
 
     public ParticleEffectComponent(Map<String, Object> config) {
@@ -130,11 +132,14 @@ public class ParticleEffectComponent implements ConfigurationSerializable
 
         if(config.get("externalEffectName") != null) {
             externalEffectName = (String) config.get("externalEffectName");
-            System.out.println("Loading external effect name: " + externalEffectName);
         }
 
         if(config.get("armorStandProperties") != null) {
             armorStandProperties = (ArmorStandProperties) config.get("armorStandProperties");
+        }
+
+        if(config.get("displayEntityProperties") != null) {
+            displayEntityProperties = (DisplayEntityProperties) config.get("displayEntityProperties");
         }
     }
 
@@ -163,6 +168,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         if(externalEffectName != null)
             ret.put("externalEffectName", externalEffectName);
         ret.put("armorStandProperties", armorStandProperties);
+        ret.put("displayEntityProperties", displayEntityProperties);
 	return ret;
     }
 
@@ -173,7 +179,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
     public void deleteModifiers() {
         modifiers = new ArrayList<>();
     }
-    
+
     public boolean isActive(int step) {
         if(timeline.size() == 0) return true;
 	for(ParticleEffectTimelineEntry tle: timeline) {
@@ -197,7 +203,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         ParticleEffectTimelineEntry tle = timeline.get(timelineNo);
         return tle.getStepStart() + tle.getStepCount() - step;
     }
-    
+
     public int getLocationOffset(int timelineNo) {
         if(timeline.size() == 0) return 0;
         ParticleEffectTimelineEntry tle = timeline.get(timelineNo);
@@ -209,19 +215,17 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         ParticleEffectTimelineEntry tle = timeline.get(timelineNo);
         return tle.getEffectOffset();
     }
-    
+
     public int getTimelineCount() {
         if(timeline.size() == 0) return 1;
         return timeline.size();
     }
-    
+
     public List<String> getInfo(boolean detailed) {
 	List<String> ret = new ArrayList<>();
 	ret.add("  Source: " + coordinates.getInfo(detailed));
 
-        System.out.println("External effect name: " + externalEffectName);
         if(externalEffectName != null) {
-            System.out.println("Effect name: " + externalEffectName + ", effect: " + externalEffect);
             String s = "  §eExternal effect:§r " + externalEffectName;
             if(externalEffect == null) s += " §c(Not found)§r";
             ret.add(s);
@@ -248,6 +252,18 @@ public class ParticleEffectComponent implements ConfigurationSerializable
                 }
                 ret.add("    Size: " + size.getInfo(detailed));
             }
+        }
+
+        if(isDisplayEntityActive()) {
+
+            DisplayEntityProperties p = displayEntityProperties;
+
+            String ai = "  §eDisplay entity:§r ";
+            if(p.getItemData() != null)
+                ai += "Item (" + p.getItemData().getType() + ")";
+            else if(p.getText() != null)
+                ai += "Text (" + p.getText() + "§r)";
+            ret.add(ai);
         }
 
         if(isArmorStandActive()) {
@@ -565,6 +581,10 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         return armorStandProperties != null;
     }
 
+    public final boolean isDisplayEntityActive() {
+        return displayEntityProperties != null;
+    }
+    
     public final ArmorStandProperties getArmorStandProperties() {
         return armorStandProperties;
     }
@@ -579,6 +599,20 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         armorStandProperties = null;
     }
 
+    public final DisplayEntityProperties getDisplayEntityProperties() {
+        return displayEntityProperties;
+    }
+    
+    public final DisplayEntityProperties createOrGetDisplayEntityProperties() {
+        if(displayEntityProperties == null)
+            displayEntityProperties = new DisplayEntityProperties();
+        return displayEntityProperties;
+    }
+    
+    public final void removeDisplayEntity() {
+        displayEntityProperties = null;
+    }
+    
     private boolean isZero(ValueSource valueSource) {
         if(! (valueSource instanceof ConstantValueSource)) return false;
         ConstantValueSource cvs = (ConstantValueSource) valueSource;

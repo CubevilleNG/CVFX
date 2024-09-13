@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.World;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.EulerAngle;
@@ -22,9 +23,13 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.ItemDisplay;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.util.Transformation;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.level.WorldServer;
@@ -39,11 +44,13 @@ import org.cubeville.effects.pluginhook.PluginHookManager;
 public class ParticleEffect extends EffectWithLocation implements EffectWithHook
 {
     private static List<Material> noCollisionBlocks = Arrays.asList(Material.CHAIN, Material.IRON_BARS, Material.LIGHT_BLUE_CARPET, Material.LIGHT_GRAY_CARPET, Material.LIME_CARPET, Material.MAGENTA_CARPET, Material.ORANGE_CARPET, Material.PINK_CARPET, Material.PURPLE_CARPET, Material.RED_CARPET, Material.WHITE_CARPET, Material.YELLOW_CARPET, Material.GREEN_CARPET, Material.GRAY_CARPET, Material.BROWN_CARPET, Material.BLACK_CARPET, Material.CYAN_CARPET , Material.TWISTING_VINES);
-    
+
     private List<ParticleEffectComponent> components;
 
     // 1st int: runningEffectId, 2nd int: Component, 3rd int: Timeline-No
     private HashMap<Integer, HashMap<Integer, HashMap<Integer, ArmorStand>>> armorstands = new HashMap<>();
+    private HashMap<Integer, HashMap<Integer, HashMap<Integer, Display>>> displayentities = new HashMap<>();
+
     private int stepsLoop;
     private int repeatCount; // 0 = indefinitely, not recommended though
     private int repeatOffset;
@@ -88,6 +95,10 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         as.remove();
     }
 
+    private void removeDisplayEntity(Display de) {
+        de.remove();
+    }
+        
     private void removeArmorStandForTimeline(int id, int componentNo, int timelineNo) {
         HashMap<Integer, HashMap<Integer, ArmorStand>> m = armorstands.get(id);
         if(m == null) return;
@@ -97,6 +108,17 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
 
         ArmorStand as = am.remove(timelineNo);
         removeArmorStand(as);
+    }
+
+    private void removeDisplayEntityForTimeline(int id, int componentNo, int timelineNo) {
+        HashMap<Integer, HashMap<Integer, Display>> m = displayentities.get(id);
+        if(m == null) return;
+
+        HashMap<Integer, Display> dm = m.get(componentNo);
+        if(dm == null) return;
+
+        Display entity = dm.remove(timelineNo);
+        removeDisplayEntity(entity);
     }
     
     private void removeArmorStandsForId(int id) {
@@ -112,9 +134,23 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         }
     }
 
+    private void removeDisplayEntitiesForId(int id) {
+        HashMap<Integer, HashMap<Integer, Display>> m = displayentities.remove(id);
+        if(m == null) return;
+
+        for(int componentNo: m.keySet()) {
+            HashMap<Integer, Display> dm = m.get(componentNo);
+            if(dm == null) continue;
+            for(Display de: dm.values()) {
+                removeDisplayEntity(de);
+            }
+        }
+    }
+    
     public boolean play(int step, ParticleEffectLocationCalculator locationCalculator, Player player, int id) {
         if(!hasStep(step)) {
             removeArmorStandsForId(id);
+            removeDisplayEntitiesForId(id);
             return false;
         }
 
@@ -124,7 +160,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         boolean entityCollisionDetected = false;
 
         int componentNo = 0;
-        
+
         for(ParticleEffectComponent component: components) {
             if(component.isActive(localStep)) {
                 boolean blockCollisionCheck = component.getBlockCollisionCheck();
@@ -134,12 +170,88 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                     if(component.isTimelineActive(timelineNo, localStep) == false) continue;
 
                     int effectStep = localStep - component.getEffectOffset(timelineNo);
-                                            
+
                     Location location = locationCalculator.getLocationForStep(step - component.getLocationOffset(timelineNo));
                     if(location == null) continue;
                     
                     List<Vector> particleLocations = component.getModifiedCoordinates(effectStep, false);
 
+                    if(component.isDisplayEntityActive() && particleLocations.size() > 0) {
+                        if(component.getRemainingStepsOfTimeline(timelineNo, localStep) <= 1) {
+                            removeDisplayEntityForTimeline(id, componentNo, timelineNo);
+                        }
+                        else {
+                            DisplayEntityProperties properties = component.getDisplayEntityProperties();
+
+                            Location displayEntityLocation = location.clone();
+                            {
+                                Vector nvec = particleLocations.get(0);
+                                if(component.getDirectionalCoordinates()) {
+                                    nvec = transform(location.getYaw(), location.getPitch(), nvec);
+                                }
+                                displayEntityLocation.add(nvec);
+                            }
+
+                            HashMap<Integer, HashMap<Integer, Display>> m = displayentities.get(id);
+                            if(m == null) {
+                                m = new HashMap<Integer, HashMap<Integer, Display>>();
+                                displayentities.put(id, m);
+                            }
+
+                            HashMap<Integer, Display> tlm = m.get(componentNo);
+                            if(tlm == null) {
+                                tlm = new HashMap<Integer, Display>();
+                                m.put(componentNo, tlm);
+                            }
+
+                            Display entity = tlm.get(timelineNo);
+                            if(entity == null) {
+                                World world = displayEntityLocation.getWorld();
+                                if(properties.isItemDisplay()) {
+                                    ItemDisplay i = (ItemDisplay) world.spawnEntity(displayEntityLocation, EntityType.ITEM_DISPLAY);
+                                    i.setItemStack(properties.getItemData());
+                                    entity = i;
+                                }
+                                else if(properties.isTextDisplay()) {
+                                    TextDisplay t = (TextDisplay) world.spawnEntity(displayEntityLocation, EntityType.TEXT_DISPLAY);
+                                    t.setText(properties.getText());
+                                    t.setAlignment(TextDisplay.TextAlignment.CENTER);
+                                    t.setBackgroundColor(Color.fromRGB(0, 0, 0));
+                                    t.setTextOpacity((byte) 255); // Fully opaque
+                                    t.setSeeThrough(false);
+                                    t.setShadowed(false);
+                                    entity = t;
+                                }
+                                // TODO activate in 1.21: entity.setTeleportDuration(1);
+                                entity.setPersistent(false);
+                                tlm.put(timelineNo, entity);
+                            }
+                            else {
+                                entity.teleport(displayEntityLocation);
+                            }
+
+                            org.joml.Vector3f translation =
+                                new org.joml.Vector3f((float) properties.moveX.getValue(effectStep),
+                                                      (float) properties.moveY.getValue(effectStep),
+                                                      (float) properties.moveZ.getValue(effectStep));
+                            org.joml.Vector3f scale =
+                                new org.joml.Vector3f((float) properties.scaleX.getValue(effectStep),
+                                                      (float) properties.scaleY.getValue(effectStep),
+                                                      (float) properties.scaleZ.getValue(effectStep));
+                            org.joml.AxisAngle4f rotationLeft =
+                                new org.joml.AxisAngle4f((float) Math.toRadians(properties.rotateLeftAngle.getValue(effectStep)),
+                                                         (float) properties.rotateLeftX.getValue(effectStep),
+                                                         (float) properties.rotateLeftY.getValue(effectStep),
+                                                         (float) properties.rotateLeftZ.getValue(effectStep));
+                            org.joml.AxisAngle4f rotationRight =
+                                new org.joml.AxisAngle4f((float) Math.toRadians(properties.rotateRightAngle.getValue(effectStep)),
+                                                         (float) properties.rotateRightX.getValue(effectStep),
+                                                         (float) properties.rotateRightY.getValue(effectStep),
+                                                         (float) properties.rotateRightZ.getValue(effectStep));
+                            entity.setTransformation(new Transformation(translation, rotationLeft, scale, rotationRight));
+                        }
+                    }
+                    
                     if(component.isArmorStandActive() && particleLocations.size() > 0) {
                         if(component.getRemainingStepsOfTimeline(timelineNo, localStep) <= 1) {
                             removeArmorStandForTimeline(id, componentNo, timelineNo);
@@ -367,7 +479,10 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
             if(hasStep(step + 1) == false) hasNextStep = false;
         }
 
-        if(hasNextStep == false) removeArmorStandsForId(id);
+        if(hasNextStep == false) {
+            removeArmorStandsForId(id);
+            removeDisplayEntitiesForId(id);
+        }
 
         return hasNextStep;
     }

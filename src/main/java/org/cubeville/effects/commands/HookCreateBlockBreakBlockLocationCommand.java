@@ -18,7 +18,6 @@ public class HookCreateBlockBreakBlockLocationCommand extends Command
 {
     public HookCreateBlockBreakBlockLocationCommand() {
         super("hook create blockbreak blocklocation");
-        System.out.println("Register hook create blockbreak blocklocation command");
         addBaseParameter(new CommandParameterEffect(EffectWithLocation.class));
     }
 

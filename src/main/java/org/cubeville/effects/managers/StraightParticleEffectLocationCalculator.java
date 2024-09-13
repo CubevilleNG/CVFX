@@ -40,10 +40,12 @@ public class StraightParticleEffectLocationCalculator implements ParticleEffectL
     public Location getLocationForStep(int step) {
         Location nloc = location.clone();
 
-        playerMoving = System.currentTimeMillis() - EventListener.getInstance().getLastPlayerMoveTime(player.getUniqueId()) < 400;
-        
-        if(disableWhenMoving == true && playerMoving == true) return null;
-        if(disableWhenStill == true && playerMoving == false) return null;
+        if((disableWhenMoving || disableWhenStill) && player != null) {
+            playerMoving = System.currentTimeMillis() - EventListener.getInstance().getLastPlayerMoveTime(player.getUniqueId()) < 400;
+            
+            if(disableWhenMoving == true && playerMoving == true) return null;
+            if(disableWhenStill == true && playerMoving == false) return null;
+        }
 
         if(followPlayerLocation) {
             nloc.setX(nloc.getX() + player.getLocation().getX() - initialPlayerLocation.getX());

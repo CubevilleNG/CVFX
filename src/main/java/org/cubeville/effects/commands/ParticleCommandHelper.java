@@ -15,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import org.cubeville.commons.commands.*;
+import org.cubeville.commons.utils.ColorUtils;
+
 import org.cubeville.effects.managers.Effect;
 import org.cubeville.effects.managers.EffectWithLocation;
 import org.cubeville.effects.managers.EffectManager;
@@ -64,6 +66,23 @@ public class ParticleCommandHelper
         command.addParameter("armorstandarms", true, new CommandParameterBoolean());
         command.addParameter("armorstandvisible", true, new CommandParameterBoolean());
         command.addParameter("armorstandsmall", true, new CommandParameterBoolean());
+
+        command.addFlag("itemdisplay");
+        command.addParameter("textdisplay", true, new CommandParameterString());
+        command.addParameter("displaymovex", true, new CommandParameterValueSource());
+        command.addParameter("displaymovey", true, new CommandParameterValueSource());
+        command.addParameter("displaymovez", true, new CommandParameterValueSource());
+        command.addParameter("displayscalex", true, new CommandParameterValueSource());
+        command.addParameter("displayscaley", true, new CommandParameterValueSource());
+        command.addParameter("displayscalez", true, new CommandParameterValueSource());
+        command.addParameter("displayrotateleftx", true, new CommandParameterValueSource());
+        command.addParameter("displayrotatelefty", true, new CommandParameterValueSource());
+        command.addParameter("displayrotateleftz", true, new CommandParameterValueSource());
+        command.addParameter("displayrotateleftangle", true, new CommandParameterValueSource());
+        command.addParameter("displayrotaterightx", true, new CommandParameterValueSource());
+        command.addParameter("displayrotaterighty", true, new CommandParameterValueSource());
+        command.addParameter("displayrotaterightz", true, new CommandParameterValueSource());
+        command.addParameter("displayrotaterightangle", true, new CommandParameterValueSource());
         
         command.addParameter("constantsource", true, new CommandParameterListVector());
         command.addParameter("constantsource+", true, new CommandParameterListVector());
@@ -267,6 +286,50 @@ public class ParticleCommandHelper
             }
         }
 
+        if(flags.contains("itemdisplay")) {
+            ItemStack item = player.getInventory().getItemInMainHand();
+            if(item.getType() == Material.AIR) {
+                component.removeDisplayEntity();
+            }
+            else {
+                component.createOrGetDisplayEntityProperties().setItemData(item);
+            }
+        }
+
+        if(parameters.containsKey("textdisplay")) {
+            String text = ColorUtils.addColor((String) parameters.get("textdisplay"));
+            component.createOrGetDisplayEntityProperties().setText(text);
+        }
+
+        if(parameters.containsKey("displaymovex"))
+            component.createOrGetDisplayEntityProperties().moveX = (ValueSource) parameters.get("displaymovex");
+        if(parameters.containsKey("displaymovey"))
+            component.createOrGetDisplayEntityProperties().moveY = (ValueSource) parameters.get("displaymovey");
+        if(parameters.containsKey("displaymovez"))
+            component.createOrGetDisplayEntityProperties().moveZ = (ValueSource) parameters.get("displaymovez");
+        if(parameters.containsKey("displayscalex"))
+            component.createOrGetDisplayEntityProperties().scaleX = (ValueSource) parameters.get("displayscalex");
+        if(parameters.containsKey("displayscaley"))
+            component.createOrGetDisplayEntityProperties().scaleY = (ValueSource) parameters.get("displayscaley");
+        if(parameters.containsKey("displayscalez"))
+            component.createOrGetDisplayEntityProperties().scaleZ = (ValueSource) parameters.get("displayscalez");
+        if(parameters.containsKey("displayrotateleftx"))
+            component.createOrGetDisplayEntityProperties().rotateLeftX = (ValueSource) parameters.get("displayrotateleftx");
+        if(parameters.containsKey("displayrotatelefty"))
+            component.createOrGetDisplayEntityProperties().rotateLeftY = (ValueSource) parameters.get("displayrotatelefty");
+        if(parameters.containsKey("displayrotateleftz"))
+            component.createOrGetDisplayEntityProperties().rotateLeftZ = (ValueSource) parameters.get("displayrotateleftz");
+        if(parameters.containsKey("displayrotateleftangle"))
+            component.createOrGetDisplayEntityProperties().rotateLeftAngle = (ValueSource) parameters.get("displayrotateleftangle");
+        if(parameters.containsKey("displayrotaterightx"))
+            component.createOrGetDisplayEntityProperties().rotateRightX = (ValueSource) parameters.get("displayrotaterightx");
+        if(parameters.containsKey("displayrotaterighty"))
+            component.createOrGetDisplayEntityProperties().rotateRightY = (ValueSource) parameters.get("displayrotaterighty");
+        if(parameters.containsKey("displayrotaterightz"))
+            component.createOrGetDisplayEntityProperties().rotateRightZ = (ValueSource) parameters.get("displayrotaterightz");
+        if(parameters.containsKey("displayrotaterightangle"))
+            component.createOrGetDisplayEntityProperties().rotateRightAngle = (ValueSource) parameters.get("displayrotaterightangle");
+        
         if(parameters.containsKey("armorstandactive")) {
             if((boolean) parameters.get("armorstandactive")) {
                 component.createOrGetArmorStandProperties();
@@ -413,9 +476,7 @@ public class ParticleCommandHelper
         }
 
         if(flags.contains("clearmodifiers")) {
-            System.out.println("Modifiers before clear: " + component.getModifiers().size());
             component.deleteModifiers();
-            System.out.println("Modifiers after clear: " + component.getModifiers().size());
         }
         
         if(parameters.containsKey("copymodifiers")) {

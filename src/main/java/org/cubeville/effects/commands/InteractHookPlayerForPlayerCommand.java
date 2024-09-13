@@ -21,7 +21,7 @@ import org.cubeville.effects.registry.Registry;
 public class InteractHookPlayerForPlayerCommand extends BaseCommand
 {
     public InteractHookPlayerForPlayerCommand() {
-        super("interacthookplayer");
+        super("interacthookplayerforplayer");
         addBaseParameter(new CommandParameterString());
         addBaseParameter(new CommandParameterOnlinePlayer());
         addParameter("stopat", true, new CommandParameterInteger());

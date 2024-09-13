@@ -32,7 +32,7 @@ public class PotionEffectEffect extends EffectWithLivingEntity
     
     private void printinfo()
     {
-        System.out.println("EFFECT TYPE: " + effectType);
+        //System.out.println("EFFECT TYPE: " + effectType);
     }
 
     public PotionEffectEffect(Map<String, Object> config) {
