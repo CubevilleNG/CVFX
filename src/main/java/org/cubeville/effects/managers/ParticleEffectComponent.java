@@ -264,6 +264,32 @@ public class ParticleEffectComponent implements ConfigurationSerializable
             else if(p.getText() != null)
                 ai += "Text (" + p.getText() + "§r)";
             ret.add(ai);
+
+            if(!p.moveX.getInfo(false).equals("Constant 0.0"))
+                ret.add("    Move X: " + p.moveX.getInfo(false));
+            if(!p.moveY.getInfo(false).equals("Constant 0.0"))
+                ret.add("    Move Y: " + p.moveY.getInfo(false));
+            if(!p.moveZ.getInfo(false).equals("Constant 0.0"))
+                ret.add("    Move Z: " + p.moveZ.getInfo(false));
+            if(!p.rotateLeftAngle.getInfo(false).equals("Constant 0.0")) {
+                ret.add("    Rotate left angle: " + p.rotateLeftAngle.getInfo(false));
+                ret.add("    Rotate left X: " + p.rotateLeftX.getInfo(false));
+                ret.add("    Rotate left Y: " + p.rotateLeftY.getInfo(false));
+                ret.add("    Rotate left Z: " + p.rotateLeftZ.getInfo(false));
+            }
+            if(!p.scaleX.getInfo(false).equals("Constant 1.0"))
+                ret.add("    Scale X: " + p.scaleX.getInfo(false));
+            if(!p.scaleY.getInfo(false).equals("Constant 1.0"))
+                ret.add("    Scale Y: " + p.scaleY.getInfo(false));
+            if(!p.scaleZ.getInfo(false).equals("Constant 1.0"))
+                ret.add("    Scale Z: " + p.scaleZ.getInfo(false));
+            if(!p.rotateRightAngle.getInfo(false).equals("Constant 0.0")) {
+                ret.add("    Rotate right angle: " + p.rotateRightAngle.getInfo(false));
+                ret.add("    Rotate right X: " + p.rotateRightX.getInfo(false));
+                ret.add("    Rotate right Y: " + p.rotateRightY.getInfo(false));
+                ret.add("    Rotate right Z: " + p.rotateRightZ.getInfo(false));
+            }
+
         }
 
         if(isArmorStandActive()) {
