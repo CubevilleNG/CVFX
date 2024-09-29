@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.Vector;
 import org.cubeville.effects.managers.sources.value.ValueSource;
@@ -46,6 +47,15 @@ public class CoordinateModifierMove implements CoordinateModifier
 	    ret.add(nv);
 	}
 	return ret;
+    }
+
+    public Location modifyLocation(Location location, int step) {
+        Location ret = location.clone();
+        double m = source.getValue(step);
+        if(x) ret.setX(ret.getX() + m);
+        if(y) ret.setY(ret.getY() + m);
+        if(z) ret.setZ(ret.getZ() + m);
+        return ret;
     }
 
     public Map<String, Object> serialize() {

@@ -183,6 +183,7 @@ public class Effects extends JavaPlugin {
         commandParser.addCommand(new EffectCreatePiercingCommand());
         commandParser.addCommand(new EffectCreatePotionEffectCommand());
         commandParser.addCommand(new EffectCreateSoundCommand());
+        commandParser.addCommand(new EffectImportEntityListCommand());
         commandParser.addCommand(new EffectModifyCommandWithLocationCommand());
         commandParser.addCommand(new EffectModifyParticleCommand());
         commandParser.addCommand(new EffectModifyPotionEffectCommand());

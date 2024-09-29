@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.Vector;
 import org.cubeville.effects.managers.sources.value.ValueSource;
@@ -39,6 +40,10 @@ public class CoordinateModifierScale implements CoordinateModifier
 	return ret;
     }
 
+    public Location modifyLocation(Location location, int step) {
+        return location;
+    }
+    
     public String getInfo(boolean detailed) {
 	return "Scale " + source.getInfo(detailed);
     }

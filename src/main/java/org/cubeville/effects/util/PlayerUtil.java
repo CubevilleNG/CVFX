@@ -19,7 +19,7 @@ public class PlayerUtil
                 double distsq = e.getLocation().distanceSquared(player.getLocation());
                 if(distsq <= maxDistSquared) {
                     if(e instanceof LivingEntity) {
-                        if(e.getType() == EntityType.PLAYER || e.getType() == EntityType.VILLAGER || e.getType() == EntityType.PIG || e.getType() == EntityType.COW || e.getType() == EntityType.SHEEP || e.getType() == EntityType.CHICKEN || e.getType() == EntityType.HORSE || e.getType() == EntityType.MUSHROOM_COW || e.getType() == EntityType.WOLF || e.getType() == EntityType.OCELOT || e.getType() == EntityType.DONKEY) {
+                        if(e.getType() == EntityType.PLAYER || e.getType() == EntityType.VILLAGER || e.getType() == EntityType.PIG || e.getType() == EntityType.COW || e.getType() == EntityType.SHEEP || e.getType() == EntityType.CHICKEN || e.getType() == EntityType.HORSE || e.getType() == EntityType.WOLF || e.getType() == EntityType.OCELOT || e.getType() == EntityType.DONKEY) {
 
                             double blockdist = Math.sqrt(distsq);
                             

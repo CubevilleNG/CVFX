@@ -137,6 +137,8 @@ public class ParticleCommandHelper
         command.addParameter("timeline+", true, new CommandParameterListInteger(5));
         command.addParameter("timeline-", true, new CommandParameterInteger());
         command.addParameter("copytimelines", true, new CommandParameterInteger());
+        command.addParameter("createtimelines", true, new CommandParameterListInteger(4));
+        command.addParameter("createconttimelines", true, new CommandParameterListInteger(4));
         command.addParameter("red", true, new CommandParameterValueSource());
         command.addParameter("green", true, new CommandParameterValueSource());
         command.addParameter("blue", true, new CommandParameterValueSource());
@@ -155,6 +157,15 @@ public class ParticleCommandHelper
         if(parameters.containsKey("repeatoffset")) effect.setRepeatOffset((int) parameters.get("repeatoffset"));
     }
 
+    public static boolean hasOnlyEffectValues(Map<String, Object> parameters, Set<String> flags) {
+        if(flags.size() > 0) return false;
+        for(String key: parameters.keySet()) {
+            if(! (key.equals("duration") || key.equals("repeat") || key.equals("repeatoffset")))
+                return false;
+        }
+        return true;
+    }
+    
     public static void setComponentValues(ParticleEffectComponent component, Map<String, Object> parameters, Set<String> flags, Player player, ParticleEffect parent) {
         int numberOfSources = 0;
         if(parameters.containsKey("constantsource")) numberOfSources++;
@@ -470,9 +481,8 @@ public class ParticleCommandHelper
 
         if(parameters.containsKey("modifier-")) {
             int index = (int) parameters.get("modifier-");
-            if(index > 0 && index <= component.getModifiers().size()) {
+            if(index > 0 && index <= component.getModifiers().size())
                 component.getModifiers().remove(index - 1);
-            }
         }
 
         if(flags.contains("clearmodifiers")) {
@@ -509,6 +519,29 @@ public class ParticleCommandHelper
             int tlocoffset = p.get(3);
             int teffectoffset = p.get(4);
             component.getTimeline().add(new ParticleEffectTimelineEntry(tstart, trepeat, tcount, tlocoffset, teffectoffset));
+        }
+
+        if(parameters.containsKey("createtimelines") || parameters.containsKey("createconttimelines")) {
+            boolean continuous = false;
+            List<Integer> p;
+            if(parameters.containsKey("createtimelines"))
+                p = (List<Integer>) parameters.get("createtimelines");
+            else {
+                p = (List<Integer>) parameters.get("createconttimelines");
+                continuous = true;
+            }
+            
+            int tstart = p.get(0);
+            int tinterval = p.get(1);
+            int tcount = p.get(2);
+            int tduration = p.get(3);
+            int offset = tstart;
+            int loffset = continuous ? 0 : offset;
+            for(int i = 0; i < tcount; i++) {
+                component.getTimeline().add(new ParticleEffectTimelineEntry(offset, 1, tduration, loffset, loffset));
+                offset += tinterval;
+                if(!continuous) loffset += tinterval;
+            }
         }
 
         if(parameters.containsKey("timeline-")) {

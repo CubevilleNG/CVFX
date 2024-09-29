@@ -1,4 +1,4 @@
-package org.cubeville.effects.managers;
+package org.cubeville.effects.managers; // 
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,9 +36,10 @@ import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
 
-import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R1.CraftWorld;
 
 import org.cubeville.effects.pluginhook.PluginHookManager;
+import org.cubeville.effects.managers.modifier.CoordinateModifier;
 
 @SerializableAs("ParticleEffect")
 public class ParticleEffect extends EffectWithLocation implements EffectWithHook
@@ -192,6 +193,9 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                 displayEntityLocation.add(nvec);
                             }
 
+                            for(CoordinateModifier modifier: component.getModifiers())
+                                displayEntityLocation = modifier.modifyLocation(displayEntityLocation, localStep);
+
                             HashMap<Integer, HashMap<Integer, Display>> m = displayentities.get(id);
                             if(m == null) {
                                 m = new HashMap<Integer, HashMap<Integer, Display>>();
@@ -222,7 +226,8 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                     t.setShadowed(false);
                                     entity = t;
                                 }
-                                // TODO activate in 1.21: entity.setTeleportDuration(1);
+                                entity.setTeleportDuration(1);
+                                entity.setInterpolationDuration(1);
                                 entity.setPersistent(false);
                                 tlm.put(timelineNo, entity);
                             }
@@ -421,7 +426,9 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
 
                             double speed = (double) component.getSpeed().getValue(effectStep);
                             
-                            if(component.getParticle() == Particle.REDSTONE || component.getParticle() == Particle.DUST_COLOR_TRANSITION) {
+                            if(component.getParticle() == Particle.DUST ||
+                               component.getParticle() == Particle.DUST_COLOR_TRANSITION) {
+                                
                                 int red = (int) (Math.round(component.getColourRed().getValue(effectStep) * 255));
                                 if(red < 0) red = 0;
                                 if(red > 255) red = 255;
@@ -432,7 +439,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                 if(blue < 0) blue = 0;
                                 if(blue > 255) blue = 255;
                                 float size = (float) component.getSize().getValue(effectStep);
-                                
+
                                 Particle.DustOptions dustoptions;
                                 if(component.getParticle() == Particle.DUST_COLOR_TRANSITION) {
                                     int tored = (int) (Math.round(component.getColourToRed().getValue(effectStep) * 255));
@@ -452,15 +459,23 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                 nloc.getWorld().spawnParticle(component.getParticle(), nloc.getX(), nloc.getY(), nloc.getZ(), (int)(component.getCount().getValue(effectStep)),
                                                               spread.getX(), spread.getY(), spread.getZ(), speed, dustoptions);
                             }
-                            else if(component.getParticle() == Particle.ITEM_CRACK) {
+
+                            else if(component.getParticle() == Particle.ITEM) {
+
                                 nloc.getWorld().spawnParticle(component.getParticle(), nloc.getX(), nloc.getY(), nloc.getZ(), (int)(component.getCount().getValue(effectStep)),
                                                               spread.getX(), spread.getY(), spread.getZ(), speed, new ItemStack(component.getMaterial()));
                             }
-                            else if(component.getParticle() == Particle.BLOCK_DUST || component.getParticle() == Particle.BLOCK_CRACK || component.getParticle() == Particle.FALLING_DUST) {
+
+                            else if(component.getParticle() == Particle.BLOCK ||
+                                    component.getParticle() == Particle.BLOCK_MARKER ||
+                                    component.getParticle() == Particle.DUST_PILLAR ||
+                                    component.getParticle() == Particle.FALLING_DUST) {
+                                
                                 nloc.getWorld().spawnParticle(component.getParticle(), nloc.getX(), nloc.getY(), nloc.getZ(), (int)(component.getCount().getValue(effectStep)),
                                                               spread.getX(), spread.getY(), spread.getZ(), speed, component.getMaterial().createBlockData());
                             }
-                            else {
+                            
+                            else { // TODO there are more types that need specific data: ENTITY_EFFECT, SCULK_CHARGE, SHRIEK and VIBRATION
                                 nloc.getWorld().spawnParticle(component.getParticle(), nloc.getX(), nloc.getY(), nloc.getZ(), (int)(component.getCount().getValue(effectStep)),
                                                               spread.getX(), spread.getY(), spread.getZ(), speed);
                             }

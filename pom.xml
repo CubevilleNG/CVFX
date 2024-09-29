@@ -4,7 +4,7 @@
   <groupId>org.cubeville</groupId>
   <artifactId>CVFX</artifactId>
   <packaging>jar</packaging>
-  <version>1.20.4</version>
+  <version>1.21.1</version>
   <name>CVFX</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.20-R0.1-SNAPSHOT</version>
+      <version>1.21.1-R0.1-SNAPSHOT</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
@@ -27,7 +27,13 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.20.4-R0.1-SNAPSHOT</version>
+      <version>1.21.1-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.cubeville</groupId>
+      <artifactId>CVEntityEdit</artifactId>
+      <version>1.21.1</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

@@ -63,8 +63,8 @@ public class ParticlePlayerCommand extends BaseCommand
         int stopat = 0;
         if(parameters.containsKey("stopat"))
             stopat = (int) parameters.get("stopat");
-        
-        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopat).runTaskTimer(Effects.getInstance(), 1, 1);
+
+        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopat, false).runTaskTimer(Effects.getInstance(), 1, 1);
 
 	if(flags.contains("silent")) {
 	    return new CommandResponse("");

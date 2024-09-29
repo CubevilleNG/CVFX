@@ -29,6 +29,6 @@ public class ConstantValueSource implements ValueSource
     }
     
     public String getInfo(boolean detailed) {
-	return "Constant " + value;
+	return "Constant " + Math.round(value * 100.0) / 100.0;
     }
 }

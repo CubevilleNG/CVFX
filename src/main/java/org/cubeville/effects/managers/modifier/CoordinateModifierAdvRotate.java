@@ -1,5 +1,6 @@
 package org.cubeville.effects.managers.modifier;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.Vector;
 import org.cubeville.effects.managers.sources.value.ValueSource;
@@ -58,6 +59,13 @@ public class CoordinateModifierAdvRotate implements CoordinateModifier
 //		ret.add(new Vector(v.getX() * cosRot + v.getY() * sinRot, v.getY() * cosRot - v.getX() * sinRot , v.getZ()));
 //	}
 	return ret;
+    }
+
+    public Location modifyLocation(Location location, int step) {
+        Location ret = location.clone();
+        if(direction.equals("xz"))
+            ret.setYaw((ret.getYaw() + (float)source.getValue(step)) % 360);
+        return ret;
     }
 
     public String getInfo(boolean detailed) {

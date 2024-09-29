@@ -69,7 +69,7 @@ public class BlockBreakHookParticlePlayer implements BlockBreakHook
 	loc.setY(loc.getY() + yOffset);
 	loc.setPitch((float)pitch);
         loc.setYaw(event.getPlayer().getLocation().getYaw());
-        new ParticleEffectTimedRunnable(Effects.getInstance(), event.getPlayer(), effect, stepsPerTick, speed, loc, false, false, false, false, false, 0).runTaskTimer(Effects.getInstance(), 1, 1);
+        new ParticleEffectTimedRunnable(Effects.getInstance(), event.getPlayer(), effect, stepsPerTick, speed, loc, false, false, false, false, false, 0, false).runTaskTimer(Effects.getInstance(), 1, 1);
     }
 
     public boolean usesEffect(Effect effect) {

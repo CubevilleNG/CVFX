@@ -30,7 +30,7 @@ public class DisplayEntityProperties implements ConfigurationSerializable
     public ValueSource rotateRightY = new ConstantValueSource(1);
     public ValueSource rotateRightZ = new ConstantValueSource(0);
     public ValueSource rotateRightAngle = new ConstantValueSource(0);
-    
+
     public DisplayEntityProperties() {
     }
 
@@ -38,11 +38,11 @@ public class DisplayEntityProperties implements ConfigurationSerializable
         itemData = (ItemStack) config.get("itemData");
         if(config.get("text") != null) text = (String) config.get("text");
         if(config.get("moveX") != null) moveX = (ValueSource) config.get("moveX");
-        if(config.get("moveY") != null) moveX = (ValueSource) config.get("moveY");
-        if(config.get("moveZ") != null) moveX = (ValueSource) config.get("moveZ");
+        if(config.get("moveY") != null) moveY = (ValueSource) config.get("moveY");
+        if(config.get("moveZ") != null) moveZ = (ValueSource) config.get("moveZ");
         if(config.get("scaleX") != null) scaleX = (ValueSource) config.get("scaleX");
-        if(config.get("scaleY") != null) scaleX = (ValueSource) config.get("scaleY");
-        if(config.get("scaleZ") != null) scaleX = (ValueSource) config.get("scaleZ");
+        if(config.get("scaleY") != null) scaleY = (ValueSource) config.get("scaleY");
+        if(config.get("scaleZ") != null) scaleZ = (ValueSource) config.get("scaleZ");
         if(config.get("rotateLeftX") != null) rotateLeftX = (ValueSource) config.get("rotateLeftX");
         if(config.get("rotateLeftY") != null) rotateLeftY = (ValueSource) config.get("rotateLeftY");
         if(config.get("rotateLeftZ") != null) rotateLeftZ = (ValueSource) config.get("rotateLeftZ");

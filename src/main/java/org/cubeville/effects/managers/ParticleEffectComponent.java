@@ -50,7 +50,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
     
     public ParticleEffectComponent() {
 	coordinates = new ConstantCoordinateSource();
-	particle = Particle.VILLAGER_HAPPY;
+	particle = Particle.HAPPY_VILLAGER;
 	count = new ConstantValueSource(0);
 	spreadX = new ConstantValueSource(0);
         spreadY = new ConstantValueSource(0);
@@ -237,11 +237,11 @@ public class ParticleEffectComponent implements ConfigurationSerializable
             ret.add("    SpreadX: " + spreadX.getInfo(detailed));
             ret.add("    SpreadY: " + spreadY.getInfo(detailed));
             ret.add("    SpreadZ: " + spreadZ.getInfo(detailed));
-            if(particle == Particle.ITEM_CRACK || particle == Particle.BLOCK_CRACK || particle == Particle.BLOCK_DUST || particle == Particle.FALLING_DUST) {
+            if(particle == Particle.ITEM || particle == Particle.BLOCK || particle == Particle.BLOCK_MARKER || particle == Particle.DUST_PILLAR || particle == Particle.FALLING_DUST) {
                 ret.add("    Material: " + material);
             }
             ret.add("    Speed: " + speed.getInfo(detailed));
-            if(particle != null && (particle == Particle.REDSTONE || particle == Particle.DUST_COLOR_TRANSITION)) {
+            if(particle != null && (particle == Particle.DUST || particle == Particle.DUST_COLOR_TRANSITION)) {
                 ret.add("    Red: " + colourRed.getInfo(detailed));
                 ret.add("    Green: " + colourGreen.getInfo(detailed));
                 ret.add("    Blue: " + colourBlue.getInfo(detailed));
