@@ -39,6 +39,7 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
     public void run() {
 	ticks++;
         if(stopAt > 0 && ticks >= stopAt) {
+            effect.abort(runningEffectId);
             this.cancel();
             return;
         }

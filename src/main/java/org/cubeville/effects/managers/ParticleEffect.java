@@ -147,7 +147,12 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
             }
         }
     }
-    
+
+    public void abort(int id) {
+        removeArmorStandsForId(id);
+        removeDisplayEntitiesForId(id);
+    }
+
     public boolean play(int step, ParticleEffectLocationCalculator locationCalculator, Player player, int id) {
         if(!hasStep(step)) {
             removeArmorStandsForId(id);
@@ -174,7 +179,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
 
                     Location location = locationCalculator.getLocationForStep(step - component.getLocationOffset(timelineNo));
                     if(location == null) continue;
-                    
+
                     List<Vector> particleLocations = component.getModifiedCoordinates(effectStep, false);
 
                     if(component.isDisplayEntityActive() && particleLocations.size() > 0) {
