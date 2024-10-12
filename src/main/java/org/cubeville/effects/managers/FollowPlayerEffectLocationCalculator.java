@@ -47,7 +47,7 @@ public class FollowPlayerEffectLocationCalculator implements ParticleEffectLocat
             float yaw = (float) Math.toRadians(player.getLocation().getYaw());
             double ox = -4 * Math.sin(yaw);
             double oz = 4 * Math.cos(yaw);
-            location.add(ox, 0, oz);
+            location.add(ox, 0.5, oz);
         }
     }
 

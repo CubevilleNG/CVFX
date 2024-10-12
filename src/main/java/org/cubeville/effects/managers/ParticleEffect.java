@@ -231,6 +231,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                     t.setShadowed(false);
                                     entity = t;
                                 }
+                                entity.setBrightness(new Display.Brightness(15, 15));
                                 entity.setTeleportDuration(1);
                                 entity.setInterpolationDuration(1);
                                 entity.setPersistent(false);
