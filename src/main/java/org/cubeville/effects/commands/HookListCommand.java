@@ -11,7 +11,7 @@ import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookListCommand extends Command
+public class HookListCommand extends HookCommand
 {
     public HookListCommand() {
 	super("hook list");
@@ -20,14 +20,14 @@ public class HookListCommand extends Command
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
         if(flags.contains("all")) {
-            player.sendMessage("--------------- Hook List ---------------");
+            player.sendMessage("--------------- Hooks ---------------");
             List<String> hooks = Registry.getInstance().getHookList();
             for(String h: hooks) player.sendMessage(h);
         }
         else {
-            String itemName = ItemUtil.safeGetItemInMainHandName(player);
-            player.sendMessage("Hook list for item " + itemName + ":");
-            List<String> hooks = Registry.getInstance().getHookList(itemName);
+            Integer id = getHooklistID(player, parameters);
+            player.sendMessage("Hooks for hooklist " + id + ":");
+            List<String> hooks = Registry.getInstance().getHookList(id);
             for(String h: hooks) player.sendMessage(h);
         }
         return null;

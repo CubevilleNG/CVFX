@@ -14,7 +14,7 @@ import org.cubeville.effects.managers.EffectWithLivingEntity;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractPlayerCommand extends Command
+public class HookCreateInteractPlayerCommand extends HookCommand
 {
     public HookCreateInteractPlayerCommand() {
 	super("hook create interact player");
@@ -22,9 +22,9 @@ public class HookCreateInteractPlayerCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
+        Integer id = getHooklistID(player, parameters);
         Effect effect = (Effect) baseParameters.get(0);
-        Registry.getInstance().registerEvent(itemName, new InteractHookPlayer(effect));
+        Registry.getInstance().registerEvent(id, new InteractHookPlayer(effect));
         CommandUtil.saveConfig();
         return new CommandResponse("Hook created.");
     }

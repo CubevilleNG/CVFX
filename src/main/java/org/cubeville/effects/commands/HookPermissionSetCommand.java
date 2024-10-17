@@ -5,13 +5,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.cubeville.commons.commands.Command;
 import org.cubeville.commons.commands.CommandExecutionException;
 import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookPermissionSetCommand extends Command
+public class HookPermissionSetCommand extends HookCommand
 {
     public HookPermissionSetCommand() {
         super("hook permission set");
@@ -20,10 +21,11 @@ public class HookPermissionSetCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
+        Integer id = getHooklistID(player, parameters);
+        
         String eventClass = (String) baseParameters.get(0);
         String permission = (String) baseParameters.get(1);
-        Registry.getInstance().setPermission(itemName, eventClass, permission);
+        Registry.getInstance().setPermission(id, eventClass, permission);
         CommandUtil.saveConfig();
         CommandUtil.clearPermissionCache();
         return null;

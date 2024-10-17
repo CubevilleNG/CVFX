@@ -14,7 +14,7 @@ import org.cubeville.effects.managers.EffectWithLocation;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateProjectileLaunchPlayerLocationCommand extends Command
+public class HookCreateProjectileLaunchPlayerLocationCommand extends HookCommand
 {
     public HookCreateProjectileLaunchPlayerLocationCommand() {
         super("hook create projectilelaunch playerlocation");
@@ -22,13 +22,10 @@ public class HookCreateProjectileLaunchPlayerLocationCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.getItemInMainHandName(player);
-        if(itemName == null) {
-            throw new CommandExecutionException("No named item in hand!");
-        }
+        Integer id = getHooklistID(player, parameters);
 
         Effect effect = (Effect) baseParameters.get(0);
-        Registry.getInstance().registerEvent(itemName, new ProjectileLaunchHookPlayerLocation((Effect) baseParameters.get(0)));
+        Registry.getInstance().registerEvent(id, new ProjectileLaunchHookPlayerLocation((Effect) baseParameters.get(0)));
         CommandUtil.saveConfig();
         return new CommandResponse("Hook created.");
     }

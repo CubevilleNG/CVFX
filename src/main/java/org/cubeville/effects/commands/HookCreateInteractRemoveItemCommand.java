@@ -12,15 +12,15 @@ import org.cubeville.effects.hooks.InteractHookRemoveItem;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractRemoveItemCommand extends Command
+public class HookCreateInteractRemoveItemCommand extends HookCommand
 {
     public HookCreateInteractRemoveItemCommand() {
 	super("hook create interact removeitem");
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
-        Registry.getInstance().registerEvent(itemName, new InteractHookRemoveItem());
+        Integer id = getHooklistID(player, parameters);
+        Registry.getInstance().registerEvent(id, new InteractHookRemoveItem());
         CommandUtil.saveConfig();
         return null;
     }

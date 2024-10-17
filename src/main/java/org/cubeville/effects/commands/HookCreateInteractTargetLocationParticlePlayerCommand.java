@@ -15,7 +15,7 @@ import org.cubeville.effects.managers.ParticleEffect;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractTargetLocationParticlePlayerCommand extends Command
+public class HookCreateInteractTargetLocationParticlePlayerCommand extends HookCommand
 {
     public HookCreateInteractTargetLocationParticlePlayerCommand() {
         super("hook create interact targetlocationparticleplayer");
@@ -29,8 +29,7 @@ public class HookCreateInteractTargetLocationParticlePlayerCommand extends Comma
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.getItemInMainHandName(player);
-        if(itemName == null) throw new CommandExecutionException("No named item in hand!");
+        Integer id = getHooklistID(player, parameters);
 
         Effect effect = (Effect) baseParameters.get(0);
         double speed = 1.0;
@@ -44,7 +43,7 @@ public class HookCreateInteractTargetLocationParticlePlayerCommand extends Comma
         if(fixedpitch) fixedpitchval = (double) parameters.get("fixedpitch");
         boolean origindir = flags.contains("origindir");
         boolean condstop = flags.contains("condstop");
-        Registry.getInstance().registerEvent(itemName, new InteractHookTargetLocationParticlePlayer(effect.getName(), yoffset, step, speed, fixedpitch, fixedpitchval, origindir, condstop));
+        Registry.getInstance().registerEvent(id, new InteractHookTargetLocationParticlePlayer(effect.getName(), yoffset, step, speed, fixedpitch, fixedpitchval, origindir, condstop));
         CommandUtil.saveConfig();
 
         return new CommandResponse("Hook created.");

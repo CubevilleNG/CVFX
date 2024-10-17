@@ -12,7 +12,7 @@ import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookRemoveProjectileLaunch extends Command
+public class HookRemoveProjectileLaunch extends HookCommand
 {
     public HookRemoveProjectileLaunch() {
         super("hook remove projectilelaunch");
@@ -20,8 +20,8 @@ public class HookRemoveProjectileLaunch extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
-        Registry.getInstance().deregisterProjectileLaunchEvent(itemName, (int) baseParameters.get(0));
+        Integer id = getHooklistID(player, parameters);
+        Registry.getInstance().deregisterProjectileLaunchEvent(id, (int) baseParameters.get(0));
         CommandUtil.saveConfig();
         return null;
     }

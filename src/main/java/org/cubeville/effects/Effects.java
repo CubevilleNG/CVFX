@@ -22,6 +22,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.cubeville.commons.commands.CommandParser;
 import org.cubeville.cvtools.CVTools;
 import org.cubeville.effects.commands.*;
+import org.cubeville.effects.commands.EffectImportComponent;
+import org.cubeville.effects.commands.HookCreateInteractTargetEntityCommand;
+import org.cubeville.effects.hooklists.HooklistRegistry;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.managers.EventListener;
 import org.cubeville.effects.managers.EffectManager;
@@ -162,12 +165,16 @@ public class Effects extends JavaPlugin {
         if(player != null) player.sendMessage("Registry loaded");
         if(e != null)
             e.updateExternalEffectHookReferences();
+        HooklistRegistry h = (HooklistRegistry) getConfig().get("HooklistRegistry");
+        if(h == null) h = new HooklistRegistry();
+        if(player != null) player.sendMessage("Hooklist Registry loaded");
     }
 
     public void saveEffects() {
         FileConfiguration config = getConfig();
         config.set("EffectManager", EffectManager.getInstance());
         config.set("Registry", eventListener.getRegistry());
+        config.set("HooklistRegistry", HooklistRegistry.getInstance());
         saveConfig();
     }
     
@@ -227,6 +234,12 @@ public class Effects extends JavaPlugin {
         commandParser.addCommand(new PermissionRemoveCommand());
         commandParser.addCommand(new EffectCreateSpawnFrogWithLivingEntityCommand());
         commandParser.addCommand(new GenerateParticleCoordsCommand());
+        commandParser.addCommand(new ConvertConfigCommand());
+        commandParser.addCommand(new HooklistAddToItemCommand());
+        commandParser.addCommand(new HooklistRemoveFromItemCommand());
+        commandParser.addCommand(new ConvertItemCommand());
+        commandParser.addCommand(new HooklistGetCommand());
+        commandParser.addCommand(new HooklistCreateCommand());
         CVTools.getInstance().registerCommandParser("fx", "fx.admin", commandParser);
     }
 }

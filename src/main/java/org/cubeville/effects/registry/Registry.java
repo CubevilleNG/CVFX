@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
@@ -22,8 +23,10 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
+import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.Effects;
 import org.cubeville.effects.hooks.BlockBreakHook;
 import org.cubeville.effects.hooks.DamageOtherEntityHook;
@@ -38,15 +41,15 @@ import org.cubeville.effects.util.ItemUtil;
 @SerializableAs("Registry")
 public class Registry implements ConfigurationSerializable
 {
-    private Map<String, RegistryHook<InteractHook>> interactEvents;
-    private Map<String, RegistryHook<DamageOtherEntityHook>> damageOtherEntityEvents;
-    private Map<String, RegistryHook<ProjectileLaunchHook>> projectileLaunchEvents;
-    private Map<String, RegistryHook<ProjectileHitHook>> projectileHitEvents;
-    private Map<String, RegistryHook<MoveHook>> moveEvents;
-    private Map<String, RegistryHook<BlockBreakHook>> blockBreakEvents;
+    private Map<Integer, RegistryHook<InteractHook>> interactEvents;
+    private Map<Integer, RegistryHook<DamageOtherEntityHook>> damageOtherEntityEvents;
+    private Map<Integer, RegistryHook<ProjectileLaunchHook>> projectileLaunchEvents;
+    private Map<Integer, RegistryHook<ProjectileHitHook>> projectileHitEvents;
+    private Map<Integer, RegistryHook<MoveHook>> moveEvents;
+    private Map<Integer, RegistryHook<BlockBreakHook>> blockBreakEvents;
     
-    private Map<String, Map<String, RegistryHook<Hook>>> eventMaps;
-
+    private Map<String, Map<Integer, RegistryHook<Hook>>> eventMaps;
+    
     static Registry instance;
 
     private PermissionList permissionList;
@@ -73,13 +76,13 @@ public class Registry implements ConfigurationSerializable
 
     public Registry(Map<String, Object> config) {
         // TODO!!! : wha?
-        interactEvents = (Map<String, RegistryHook<InteractHook>>) config.get("interact");
-        damageOtherEntityEvents = (Map<String, RegistryHook<DamageOtherEntityHook>>) config.get("damage");
-        projectileLaunchEvents = (Map<String, RegistryHook<ProjectileLaunchHook>>) config.get("projectilelaunch");
-        projectileHitEvents = (Map<String, RegistryHook<ProjectileHitHook>>) config.get("projectilehit");
-        moveEvents = (Map<String, RegistryHook<MoveHook>>) config.get("move");
+        interactEvents = (Map<Integer, RegistryHook<InteractHook>>) config.get("interact");
+        damageOtherEntityEvents = (Map<Integer, RegistryHook<DamageOtherEntityHook>>) config.get("damage");
+        projectileLaunchEvents = (Map<Integer, RegistryHook<ProjectileLaunchHook>>) config.get("projectilelaunch");
+        projectileHitEvents = (Map<Integer, RegistryHook<ProjectileHitHook>>) config.get("projectilehit");
+        moveEvents = (Map<Integer, RegistryHook<MoveHook>>) config.get("move");
         if(moveEvents == null) moveEvents = new HashMap<>();
-        blockBreakEvents = (Map<String, RegistryHook<BlockBreakHook>>) config.get("blockbreak");
+        blockBreakEvents = (Map<Integer, RegistryHook<BlockBreakHook>>) config.get("blockbreak");
         if(blockBreakEvents == null) blockBreakEvents = new HashMap<>();
         initializeEventMaps();
         permissionList = (PermissionList) config.get("permissionList");
@@ -117,7 +120,7 @@ public class Registry implements ConfigurationSerializable
         List<String> ret = new ArrayList<>();
         for(String key: eventMaps.keySet()) {
             ret.add(key + ":");
-            for(String hk: eventMaps.get(key).keySet()) {
+            for(Integer hk: eventMaps.get(key).keySet()) {
                 ret.add("  " + hk + ":");
                 int cnt = 1;
                 for(Hook h: eventMaps.get(key).get(hk).getHooks()) {
@@ -128,11 +131,11 @@ public class Registry implements ConfigurationSerializable
         return ret;
     }
 
-    public List<String> getHookList(String itemName) {
+    public List<String> getHookList(Integer id) {
         List<String> ret = new ArrayList<>();
         for(String key: eventMaps.keySet()) {
-            if(eventMaps.get(key).containsKey(itemName)) {
-                RegistryHook<Hook> rh = eventMaps.get(key).get(itemName);
+            if(eventMaps.get(key).containsKey(id)) {
+                RegistryHook<Hook> rh = eventMaps.get(key).get(id);
                 String i = "";
                 if(rh.getPermission() != null) i += rh.getPermission();
                 if(rh.getCooldown() != 0) {
@@ -150,8 +153,8 @@ public class Registry implements ConfigurationSerializable
         return ret;
     }
 
-    private Map<String, RegistryHook<Hook>> getMapByHookType(Hook hook) {
-        Map<String, RegistryHook<Hook>> ret = null;
+    private Map<Integer, RegistryHook<Hook>> getMapByHookType(Hook hook) {
+        Map<Integer, RegistryHook<Hook>> ret = null;
         if(hook instanceof InteractHook) {
             ret = (Map)interactEvents;
         }
@@ -173,99 +176,117 @@ public class Registry implements ConfigurationSerializable
         return ret;
     }
     
-    public void registerEvent(String name, Hook hook) {
-        Map<String, RegistryHook<Hook>> map = getMapByHookType(hook);
-        if(map.get(name) == null) map.put(name, new RegistryHook<>());
-        map.get(name).getHooks().add(hook);
+    public void registerEvent(Integer id, Hook hook) {
+        Map<Integer, RegistryHook<Hook>> map = getMapByHookType(hook);
+        if(map.get(id) == null) map.put(id, new RegistryHook<>());
+        map.get(id).getHooks().add(hook);
     }
     
     public void processInteractEvent(PlayerInteractEvent event) {
-	if(event.getHand() != EquipmentSlot.HAND) return;
-
-        String itemName = ItemUtil.getItemName(event.getItem());
-        if(itemName == null) return;
-        if(!interactEvents.containsKey(itemName)) return;
-
-        RegistryHook<InteractHook> rh = interactEvents.get(itemName);
-        boolean isPermitted = rh.isPermitted(event.getPlayer().getUniqueId());
-        boolean processing = true;
-        for(InteractHook hook: rh.getHooks()) {
-            if((processing && isPermitted) || hook.alwaysActive()) {
-                if(hook.process(event) == false) {
-                    processing = false;
+	    if(event.getHand() != EquipmentSlot.HAND) return;
+        if (!ItemUtil.hasHooklist(event.getItem())) return;
+        
+        List<Integer> ids = ItemUtil.getHooklistIDs(event.getItem());
+        if (ids == null) return;
+        for (Integer id : ids) {
+            if (!interactEvents.containsKey(id)) continue;
+            
+            RegistryHook<InteractHook> rh = interactEvents.get(id);
+            boolean isPermitted = rh.isPermitted(event.getPlayer().getUniqueId());
+            boolean processing = true;
+            for (InteractHook hook : rh.getHooks()) {
+                if ((processing && isPermitted) || hook.alwaysActive()) {
+                    if (hook.process(event) == false) {
+                        processing = false;
+                    }
                 }
             }
         }
     }
 
-    public List<InteractHook> getInteractHooksOfItem(String ItemName) {
-        if(!interactEvents.containsKey(ItemName)) {
+    public List<InteractHook> getInteractHooksOfItem(Integer id) {
+        if(!interactEvents.containsKey(id)) {
             return null;
         }
-        List<InteractHook> hooks = interactEvents.get(ItemName).getHooks();
+        List<InteractHook> hooks = interactEvents.get(id).getHooks();
         return hooks;
     }
     
     public void processMoveEvent(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        String itemName = ItemUtil.getItemName(event.getPlayer().getInventory().getBoots());
+        List<Integer> ids = new ArrayList<>();
+        for (ItemStack item : player.getInventory().getArmorContents()) {
+            if (!ItemUtil.hasHooklist(item)) continue;
+            List<Integer> newIDS = ItemUtil.getHooklistIDs(item);
+            if (newIDS != null) {
+                ids.addAll(ItemUtil.getHooklistIDs(item));
+            }
+        }
         
-        if(itemName == null) return;
-        if(!moveEvents.containsKey(itemName)) return;
-
-        RegistryHook<MoveHook> rh = moveEvents.get(itemName);
-        boolean isPermitted = rh.isPermitted(event.getPlayer().getUniqueId());
-        for(MoveHook hook: rh.getHooks()) {
-            if(isPermitted || hook.alwaysActive()) {
-                hook.process(event);
+        for (Integer id : ids) {
+            
+            if (!moveEvents.containsKey(id)) continue;
+            
+            RegistryHook<MoveHook> rh = moveEvents.get(id);
+            boolean isPermitted = rh.isPermitted(event.getPlayer().getUniqueId());
+            for (MoveHook hook : rh.getHooks()) {
+                if (isPermitted || hook.alwaysActive()) {
+                    hook.process(event);
+                }
             }
         }
     }
 
     public void processBlockBreakEvent(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        String itemName = ItemUtil.getItemName(event.getPlayer().getInventory().getItemInMainHand());
-        if(itemName != null && blockBreakEvents.containsKey(itemName)) {
-            RegistryHook<BlockBreakHook> rh = blockBreakEvents.get(itemName);
-            boolean isPermitted = rh.isPermitted(player.getUniqueId());
-            for(BlockBreakHook hook: rh.getHooks()) {
-                if(isPermitted || hook.alwaysActive()) {
-                    hook.process(event);
+        List<Integer> ids = ItemUtil.getHooklistIDs(event.getPlayer().getInventory().getItemInMainHand());
+        if (ids == null) return;
+        for (Integer id : ids) {
+            if (blockBreakEvents.containsKey(id)) {
+                RegistryHook<BlockBreakHook> rh = blockBreakEvents.get(id);
+                boolean isPermitted = rh.isPermitted(player.getUniqueId());
+                for (BlockBreakHook hook : rh.getHooks()) {
+                    if (isPermitted || hook.alwaysActive()) {
+                        hook.process(event);
+                    }
                 }
             }
         }
     }
     
-    public void deregisterInteractEvent(String name, int index) {
-        deregisterEvent(interactEvents, name, index);
+    public void deregisterInteractEvent(Integer id, int index) {
+        deregisterEvent(interactEvents, id, index);
     }
 
-    public void deregisterProjectileLaunchEvent(String name, int index) {
-        deregisterEvent(projectileLaunchEvents, name, index);
+    public void deregisterProjectileLaunchEvent(Integer id, int index) {
+        deregisterEvent(projectileLaunchEvents, id, index);
     }
 
-    public void deregisterProjectileHitEvent(String name, int index) {
-        deregisterEvent(projectileHitEvents, name, index);
+    public void deregisterProjectileHitEvent(Integer id, int index) {
+        deregisterEvent(projectileHitEvents, id, index);
     }
 
-    public void deregisterMoveEvent(String name, int index) {
-        deregisterEvent(moveEvents, name, index);
+    public void deregisterMoveEvent(Integer id, int index) {
+        deregisterEvent(moveEvents, id, index);
     }
 
-    public void deregisterBlockBreakEvent(String name, int index) {
-        deregisterEvent(blockBreakEvents, name, index);
+    public void deregisterBlockBreakEvent(Integer id, int index) {
+        deregisterEvent(blockBreakEvents, id, index);
     }
     
     public void processEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
         if(event.getDamager() instanceof Player) {
             Player damager = (Player) event.getDamager();
-            String itemName = ItemUtil.getItemName(damager.getInventory().getItemInMainHand());
-            if(itemName != null && damageOtherEntityEvents.containsKey(itemName)) {
-                RegistryHook<DamageOtherEntityHook> rh = damageOtherEntityEvents.get(itemName);
-                boolean isPermitted = rh.isPermitted(damager.getUniqueId());
-                for(DamageOtherEntityHook hook: rh.getHooks()) {
-                    if(isPermitted || hook.alwaysActive()) {
-                        hook.process(event);
+            List<Integer> ids = ItemUtil.getHooklistIDs(damager.getInventory().getItemInMainHand());
+            if (ids == null) return;
+            for (Integer id : ids) {
+                if (damageOtherEntityEvents.containsKey(id)) {
+                    RegistryHook<DamageOtherEntityHook> rh = damageOtherEntityEvents.get(id);
+                    boolean isPermitted = rh.isPermitted(damager.getUniqueId());
+                    for (DamageOtherEntityHook hook : rh.getHooks()) {
+                        if (isPermitted || hook.alwaysActive()) {
+                            hook.process(event);
+                        }
                     }
                 }
             }
@@ -287,8 +308,8 @@ public class Registry implements ConfigurationSerializable
         }
     }
 
-    public void deregisterDamageOtherEntityEvent(String name, int index) {
-        deregisterEvent(damageOtherEntityEvents, name, index);
+    public void deregisterDamageOtherEntityEvent(Integer id, int index) {
+        deregisterEvent(damageOtherEntityEvents, id, index);
     }
 
     public void processProjectileLaunchEvent(ProjectileLaunchEvent event) {
@@ -298,15 +319,17 @@ public class Registry implements ConfigurationSerializable
         Player player = (Player) shooter;
 
         // TODO: Will the last snowball also trigger?
-        String itemName = ItemUtil.getItemName(player.getInventory().getItemInMainHand());
-        if(itemName == null) return;
-
-        if(projectileLaunchEvents.containsKey(itemName)) {
-            RegistryHook<ProjectileLaunchHook> rh = projectileLaunchEvents.get(itemName);
-            boolean isPermitted = rh.isPermitted(player.getUniqueId());
-            for(ProjectileLaunchHook hook: rh.getHooks()) {
-                if(isPermitted || hook.alwaysActive()) {
-                    hook.process(event);
+        List<Integer> ids = ItemUtil.getHooklistIDs(player.getInventory().getItemInMainHand());
+        if (ids == null) return;
+        
+        for (Integer id : ids) {
+            if (projectileLaunchEvents.containsKey(id)) {
+                RegistryHook<ProjectileLaunchHook> rh = projectileLaunchEvents.get(id);
+                boolean isPermitted = rh.isPermitted(player.getUniqueId());
+                for (ProjectileLaunchHook hook : rh.getHooks()) {
+                    if (isPermitted || hook.alwaysActive()) {
+                        hook.process(event);
+                    }
                 }
             }
         }
@@ -315,24 +338,26 @@ public class Registry implements ConfigurationSerializable
         // if(projectileHitEvents.containsKey(itemName)) {
         //     addProjectileHitAction((Projectile) event.getEntity(), new ProjectileTrackerHookProcessor(projectileHitEvents.get(itemName)));
         // }
-        if(damageOtherEntityEvents.containsKey(itemName)) {
-            addProjectileDamageAction((Projectile) event.getEntity(), damageOtherEntityEvents.get(itemName));
+        for (Integer id : ids) {
+            if (damageOtherEntityEvents.containsKey(id)) {
+                addProjectileDamageAction((Projectile) event.getEntity(), damageOtherEntityEvents.get(id));
+            }
         }
     }
 
-    private void deregisterEvent(Map<String, ?> map, String name, int index) {
-        RegistryHook rh = (RegistryHook) map.get(name);
+    private void deregisterEvent(Map<Integer, ?> map, Integer id, int index) {
+        RegistryHook rh = (RegistryHook) map.get(id);
         List<?> list = rh.getHooks();
-        if(list == null) throw new IllegalArgumentException("No hooks available for item " + name + ".");
+        if(list == null) throw new IllegalArgumentException("No hooks available for hooklist " + id + ".");
         if(index < 1 || index > list.size()) throw new IllegalArgumentException("No hook nr " + index + " available.");
         list.remove(index - 1);
-        if(list.size() == 0) map.remove(name);
+        if(list.size() == 0) map.remove(id);
     }
 
     public boolean isEffectInUse(Effect effect) {
-        for(Map<String, RegistryHook<Hook>> eventMap: eventMaps.values()) {
-            for(String s: eventMap.keySet()) {
-                if(hookListUsesEffect(effect, eventMap.get(s).getHooks())) return true;
+        for(Map<Integer, RegistryHook<Hook>> eventMap: eventMaps.values()) {
+            for(Integer id: eventMap.keySet()) {
+                if(hookListUsesEffect(effect, eventMap.get(id).getHooks())) return true;
             }
         }
         return false;
@@ -367,15 +392,17 @@ public class Registry implements ConfigurationSerializable
         }*/
         if(!(event.getEntity().getShooter() instanceof Player)) return;
         Player player = (Player) event.getEntity().getShooter();
-        String itemName = ItemUtil.getItemName(player.getInventory().getItemInMainHand());
-        if(itemName == null) return;
-
-        if(projectileHitEvents.containsKey(itemName)) {
-            RegistryHook<ProjectileHitHook> rh = projectileHitEvents.get(itemName);
-            boolean isPermitted = rh.isPermitted(player.getUniqueId());
-            for(ProjectileHitHook hook : rh.getHooks()) {
-                if(isPermitted || hook.alwaysActive()) {
-                    hook.process(event);
+        List<Integer> ids = ItemUtil.getHooklistIDs(player.getInventory().getItemInMainHand());
+        if (ids == null) return;
+        
+        for (Integer id : ids) {
+            if (projectileHitEvents.containsKey(id)) {
+                RegistryHook<ProjectileHitHook> rh = projectileHitEvents.get(id);
+                boolean isPermitted = rh.isPermitted(player.getUniqueId());
+                for (ProjectileHitHook hook : rh.getHooks()) {
+                    if (isPermitted || hook.alwaysActive()) {
+                        hook.process(event);
+                    }
                 }
             }
         }
@@ -395,16 +422,16 @@ public class Registry implements ConfigurationSerializable
         projectileDamageActions.put(uuid, new ProjectileDamageTracker(registryHook));
     }
 
-    public void setPermission(String itemName, String eventClass, String permission) {
-        Map<String, RegistryHook<Hook>> eventMap = (Map<String, RegistryHook<Hook>>) eventMaps.get(eventClass);
-        if(!eventMap.containsKey(itemName)) throw new IllegalArgumentException("Item not defined in this event class.");
-        eventMap.get(itemName).setPermission(permission);
+    public void setPermission(Integer id, String eventClass, String permission) {
+        Map<Integer, RegistryHook<Hook>> eventMap = (Map<Integer, RegistryHook<Hook>>) eventMaps.get(eventClass);
+        if(!eventMap.containsKey(id)) throw new IllegalArgumentException("Item not defined in this event class.");
+        eventMap.get(id).setPermission(permission);
     }
 
-    public void setCooldown(String itemName, String eventClass, double cooldown) {
-        Map<String, RegistryHook<Hook>> eventMap = (Map<String, RegistryHook<Hook>>) eventMaps.get(eventClass);
-        if(!eventMap.containsKey(itemName)) throw new IllegalArgumentException("Item not defined in this event class.");
-        eventMap.get(itemName).setCooldown(new Double(cooldown * 1000).intValue());
+    public void setCooldown(Integer id, String eventClass, double cooldown) {
+        Map<Integer, RegistryHook<Hook>> eventMap = (Map<Integer, RegistryHook<Hook>>) eventMaps.get(eventClass);
+        if(!eventMap.containsKey(id)) throw new IllegalArgumentException("Item not defined in this event class.");
+        eventMap.get(id).setCooldown(new Double(cooldown * 1000).intValue());
     }
     
     public Set<String> getEventClasses() {
@@ -412,10 +439,12 @@ public class Registry implements ConfigurationSerializable
     }
 
     public void clearPermissionCache() {
-        for(Map<String, RegistryHook<Hook>> eventMap: eventMaps.values()) {
+        for(Map<Integer, RegistryHook<Hook>> eventMap: eventMaps.values()) {
             for(RegistryHook<Hook> hook: eventMap.values()) {
                 hook.clearPermissionCache();
             }
         }
     }
+    
+    
 }

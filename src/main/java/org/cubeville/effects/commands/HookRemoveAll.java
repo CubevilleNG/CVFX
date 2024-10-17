@@ -11,14 +11,14 @@ import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookRemoveAll extends Command
+public class HookRemoveAll extends HookCommand
 {
     public HookRemoveAll() {
         super("hook remove all");
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
+        Integer id = getHooklistID(player, parameters);
         // Registry.getInstance().deregisterAllEvents(itemName); // TODO
         CommandUtil.saveConfig();
         return null;

@@ -12,7 +12,7 @@ import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookRemoveBlockBreak extends Command
+public class HookRemoveBlockBreak extends HookCommand
 {
     public HookRemoveBlockBreak() {
         super("hook remove blockbreak");
@@ -20,8 +20,8 @@ public class HookRemoveBlockBreak extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
-        Registry.getInstance().deregisterBlockBreakEvent(itemName, (int) baseParameters.get(0));
+        Integer id = getHooklistID(player, parameters);
+        Registry.getInstance().deregisterBlockBreakEvent(id, (int) baseParameters.get(0));
         CommandUtil.saveConfig();
         return null;
     }

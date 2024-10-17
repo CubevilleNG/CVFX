@@ -15,7 +15,7 @@ import org.cubeville.effects.managers.ParticleEffect;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractParticlePlayerCommand extends Command
+public class HookCreateInteractParticlePlayerCommand extends HookCommand
 {
     public HookCreateInteractParticlePlayerCommand() {
         super("hook create interact particleplayer");
@@ -34,8 +34,7 @@ public class HookCreateInteractParticlePlayerCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.getItemInMainHandName(player);
-        if(itemName == null) throw new CommandExecutionException("No named item in hand!");
+        Integer id = getHooklistID(player, parameters);
 
         Effect effect = (Effect) baseParameters.get(0);
         double speed = 1.0;
@@ -49,7 +48,7 @@ public class HookCreateInteractParticlePlayerCommand extends Command
         if(fixedpitch) fixedpitchval = (double) parameters.get("fixedpitch");
         double ysneakshift = 0.0;
         if(parameters.get("ysneakshift") != null) ysneakshift = (double) parameters.get("ysneakshift");
-        Registry.getInstance().registerEvent(itemName, new InteractHookParticlePlayer(effect.getName(), yoffset, step, speed, fixedpitch, fixedpitchval, ysneakshift, flags.contains("followplayerlocation"), flags.contains("followplayeryaw"), flags.contains("followplayerpitch"), flags.contains("disablewhenmoving"), flags.contains("disablewhenstill"), flags.contains("followplayer")));
+        Registry.getInstance().registerEvent(id, new InteractHookParticlePlayer(effect.getName(), yoffset, step, speed, fixedpitch, fixedpitchval, ysneakshift, flags.contains("followplayerlocation"), flags.contains("followplayeryaw"), flags.contains("followplayerpitch"), flags.contains("disablewhenmoving"), flags.contains("disablewhenstill"), flags.contains("followplayer")));
         CommandUtil.saveConfig();
 
         return new CommandResponse("Hook created.");

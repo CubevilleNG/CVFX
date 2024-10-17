@@ -5,6 +5,9 @@ import org.cubeville.commons.commands.Command;
 import org.cubeville.commons.commands.CommandExecutionException;
 import org.cubeville.commons.commands.CommandParameterInteger;
 import org.cubeville.commons.commands.CommandResponse;
+import org.cubeville.effects.hooklists.HooklistRegistry;
+import org.cubeville.effects.hooks.BlockBreakHookBlockLocation;
+import org.cubeville.effects.managers.Effect;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
@@ -12,17 +15,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HookRemoveProjectileHit extends HookCommand
+public class HooklistAddToItemCommand extends Command
 {
-    public HookRemoveProjectileHit() {
-        super("hook remove projectilehit");
+    public HooklistAddToItemCommand() {
+        super("hooklist addtoitem");
         addBaseParameter(new CommandParameterInteger());
     }
-
+    
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        Integer id = getHooklistID(player, parameters);
-        Registry.getInstance().deregisterProjectileHitEvent(id, (int) baseParameters.get(0));
-        CommandUtil.saveConfig();
-        return null;
+        Integer id = (Integer) baseParameters.get(0);
+        if (!HooklistRegistry.getInstance().containsID(id)) throw new CommandExecutionException("Invalid hooklist ID!");
+        
+        ItemUtil.addHooklist(player.getInventory().getItemInMainHand(), id);
+        
+        return new CommandResponse("Hooklist " + id + " added.");
     }
 }

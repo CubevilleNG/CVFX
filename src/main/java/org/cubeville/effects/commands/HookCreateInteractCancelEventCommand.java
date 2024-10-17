@@ -12,15 +12,15 @@ import org.cubeville.effects.hooks.InteractHookCancelEvent;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractCancelEventCommand extends Command
+public class HookCreateInteractCancelEventCommand extends HookCommand
 {
     public HookCreateInteractCancelEventCommand() {
         super("hook create interact cancel");
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
-        Registry.getInstance().registerEvent(itemName, new InteractHookCancelEvent());
+        Integer id = getHooklistID(player, parameters);
+        Registry.getInstance().registerEvent(id, new InteractHookCancelEvent());
         CommandUtil.saveConfig();
         return null;
     }

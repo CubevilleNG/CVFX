@@ -22,7 +22,7 @@ public class InteractHookPlayerForPlayerCommand extends BaseCommand
 {
     public InteractHookPlayerForPlayerCommand() {
         super("interacthookplayerforplayer");
-        addBaseParameter(new CommandParameterString());
+        addBaseParameter(new CommandParameterInteger());
         addBaseParameter(new CommandParameterOnlinePlayer());
         addParameter("stopat", true, new CommandParameterInteger());
         addFlag("silent");
@@ -30,9 +30,8 @@ public class InteractHookPlayerForPlayerCommand extends BaseCommand
 
     public CommandResponse execute(CommandSender player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
 
-        String itemname = (String) baseParameters.get(0);
-        String citemname = itemname.replace('&', '§');
-        List<InteractHook> hooks = Registry.getInstance().getInteractHooksOfItem(citemname);
+        Integer id = (Integer) baseParameters.get(0);
+        List<InteractHook> hooks = Registry.getInstance().getInteractHooksOfItem(id);
 
         Player forPlayer = (Player) baseParameters.get(1);
 

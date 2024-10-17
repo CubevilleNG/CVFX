@@ -14,7 +14,7 @@ import org.cubeville.effects.managers.PiercingEffect;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateDamageOtherEntityEventAndDamagerCommand extends Command
+public class HookCreateDamageOtherEntityEventAndDamagerCommand extends HookCommand
 {
     public HookCreateDamageOtherEntityEventAndDamagerCommand() {
         super("hook create damage eventanddamager");
@@ -22,9 +22,9 @@ public class HookCreateDamageOtherEntityEventAndDamagerCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
+        Integer id = getHooklistID(player, parameters);
         Effect effect = (Effect) baseParameters.get(0);
-        Registry.getInstance().registerEvent(itemName, new DamageOtherEntityHookEventAndDamager(effect));
+        Registry.getInstance().registerEvent(id, new DamageOtherEntityHookEventAndDamager(effect));
         CommandUtil.saveConfig();
         return null;
     }

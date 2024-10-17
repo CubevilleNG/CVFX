@@ -14,7 +14,7 @@ import org.cubeville.effects.managers.ParticleEffect;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateProjectileLaunchParticlePlayerCommand extends Command
+public class HookCreateProjectileLaunchParticlePlayerCommand extends HookCommand
 {
     public HookCreateProjectileLaunchParticlePlayerCommand() {
         super("hook create projectilelaunch particleplayer");
@@ -22,10 +22,9 @@ public class HookCreateProjectileLaunchParticlePlayerCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.getItemInMainHandName(player);
-        if(itemName == null) throw new CommandExecutionException("No named item in hand!");
+        Integer id = getHooklistID(player, parameters);
         Effect effect = (Effect) baseParameters.get(0);
-        Registry.getInstance().registerEvent(itemName, new ProjectileLaunchHookParticlePlayer(effect.getName()));
+        Registry.getInstance().registerEvent(id, new ProjectileLaunchHookParticlePlayer(effect.getName()));
         CommandUtil.saveConfig();
         return new CommandResponse("Hook created");
     }

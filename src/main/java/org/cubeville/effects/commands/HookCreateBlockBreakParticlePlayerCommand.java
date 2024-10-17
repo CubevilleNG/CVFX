@@ -15,7 +15,7 @@ import org.cubeville.effects.managers.ParticleEffect;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateBlockBreakParticlePlayerCommand extends Command {
+public class HookCreateBlockBreakParticlePlayerCommand extends HookCommand {
 
     public HookCreateBlockBreakParticlePlayerCommand() {
         super("hook create blockbreak particleplayer");
@@ -27,8 +27,7 @@ public class HookCreateBlockBreakParticlePlayerCommand extends Command {
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.getItemInMainHandName(player);
-        if(itemName == null) throw new CommandExecutionException("No named item in hand!");
+        Integer id = getHooklistID(player, parameters);
 
         Effect effect = (Effect) baseParameters.get(0);
         double speed = 1.0;
@@ -40,7 +39,7 @@ public class HookCreateBlockBreakParticlePlayerCommand extends Command {
         double pitch = 0.0;
         if(parameters.get("pitch") != null) pitch = (double) parameters.get("pitch");
         
-        Registry.getInstance().registerEvent(itemName, new BlockBreakHookParticlePlayer(effect.getName(), yoffset, speed, step, pitch));
+        Registry.getInstance().registerEvent(id, new BlockBreakHookParticlePlayer(effect.getName(), yoffset, speed, step, pitch));
         CommandUtil.saveConfig();
 
         return new CommandResponse("Hook created.");        

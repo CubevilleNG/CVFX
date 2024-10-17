@@ -15,7 +15,7 @@ import org.cubeville.effects.managers.EffectWithLivingEntity;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateDamageOtherEntityLivingEntityCommand extends Command
+public class HookCreateDamageOtherEntityLivingEntityCommand extends HookCommand
 {
     public HookCreateDamageOtherEntityLivingEntityCommand() {
         super("hook create damage entity");
@@ -24,8 +24,8 @@ public class HookCreateDamageOtherEntityLivingEntityCommand extends Command
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters)
         throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
-        Registry.getInstance().registerEvent(itemName, new DamageOtherEntityHookTargetEntity((EffectWithLivingEntity) baseParameters.get(0)));
+        Integer id = getHooklistID(player, parameters);
+        Registry.getInstance().registerEvent(id, new DamageOtherEntityHookTargetEntity((EffectWithLivingEntity) baseParameters.get(0)));
         CommandUtil.saveConfig();
         return null;
     }

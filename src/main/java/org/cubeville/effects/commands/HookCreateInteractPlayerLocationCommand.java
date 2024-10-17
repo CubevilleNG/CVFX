@@ -15,7 +15,7 @@ import org.cubeville.effects.managers.EffectWithLocation;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractPlayerLocationCommand extends Command
+public class HookCreateInteractPlayerLocationCommand extends HookCommand
 {
     public  HookCreateInteractPlayerLocationCommand() {
         super("hook create interact playerlocation");
@@ -26,7 +26,7 @@ public class HookCreateInteractPlayerLocationCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
+        Integer id = getHooklistID(player, parameters);
         Effect effect = (Effect) baseParameters.get(0);
         boolean fixedPitch = flags.contains("fixedpitch");
         double yoffset = 0.0;
@@ -34,7 +34,7 @@ public class HookCreateInteractPlayerLocationCommand extends Command
         double offset = 0.0;
         if(parameters.containsKey("offset")) offset = (Double) parameters.get("offset");
         
-        Registry.getInstance().registerEvent(itemName, new InteractHookPlayerLocation(effect, fixedPitch, yoffset, offset));
+        Registry.getInstance().registerEvent(id, new InteractHookPlayerLocation(effect, fixedPitch, yoffset, offset));
         CommandUtil.saveConfig();
         return new CommandResponse("Hook created.");
     }

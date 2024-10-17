@@ -14,7 +14,7 @@ import org.cubeville.effects.managers.EffectWithLocation;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateBlockBreakBlockLocationCommand extends Command
+public class HookCreateBlockBreakBlockLocationCommand extends HookCommand
 {
     public HookCreateBlockBreakBlockLocationCommand() {
         super("hook create blockbreak blocklocation");
@@ -22,9 +22,9 @@ public class HookCreateBlockBreakBlockLocationCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
+        Integer id = getHooklistID(player, parameters);
         Effect effect = (Effect) baseParameters.get(0);
-        Registry.getInstance().registerEvent(itemName, new BlockBreakHookBlockLocation(effect));
+        Registry.getInstance().registerEvent(id, new BlockBreakHookBlockLocation(effect));
         CommandUtil.saveConfig();
         return new CommandResponse("Hook created.");
     }

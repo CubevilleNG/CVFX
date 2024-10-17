@@ -1,7 +1,8 @@
 package org.cubeville.effects;
 
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.cubeville.effects.hooks.ProjectileLaunchHookCancelEvent;
+import org.cubeville.effects.hooklists.Hooklist;
+import org.cubeville.effects.hooklists.HooklistRegistry;
 
 public class SerializationRegistration
 {
@@ -50,5 +51,7 @@ public class SerializationRegistration
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.sources.value.RandomValueSource.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.registry.RegistryHook.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.SpawnFrogWithLivingEntityEffect.class);
+        ConfigurationSerialization.registerClass(Hooklist.class);
+        ConfigurationSerialization.registerClass(HooklistRegistry.class);
     }
 }

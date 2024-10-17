@@ -26,7 +26,7 @@ public class InteractHookPlayerCommand extends BaseCommand
 {
     public InteractHookPlayerCommand() {
         super("interacthookplayer");
-        addBaseParameter(new CommandParameterString());
+        addBaseParameter(new CommandParameterInteger());
         addBaseParameter(new CommandParameterWorld());
         addBaseParameter(new CommandParameterVector());
         addBaseParameter(new CommandParameterFloat());
@@ -36,13 +36,12 @@ public class InteractHookPlayerCommand extends BaseCommand
     }
 
     public CommandResponse execute(CommandSender player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-
+        
         Vector v = (Vector) baseParameters.get(2);
         Location location = new Location((World) baseParameters.get(1), v.getX(), v.getY(), v.getZ(), (float) baseParameters.get(3), (float) baseParameters.get(4));
 
-        String itemname = (String) baseParameters.get(0);
-        String citemname = itemname.replace('&', '§');
-        List<InteractHook> hooks = Registry.getInstance().getInteractHooksOfItem(citemname);
+        Integer id = (Integer) baseParameters.get(0);
+        List<InteractHook> hooks = Registry.getInstance().getInteractHooksOfItem(id);
 
         int stopat = 0;
         if(parameters.containsKey("stopat"))

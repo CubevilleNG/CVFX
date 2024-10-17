@@ -15,7 +15,7 @@ import org.cubeville.effects.managers.EffectWithLivingEntity;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractTargetEntityCommand extends Command
+public class HookCreateInteractTargetEntityCommand extends HookCommand
 {
     public HookCreateInteractTargetEntityCommand() {
         super("hook create interact targetentity");
@@ -26,14 +26,14 @@ public class HookCreateInteractTargetEntityCommand extends Command
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
         EffectWithLivingEntity effect = (EffectWithLivingEntity) baseParameters.get(0);
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);
+        Integer id = getHooklistID(player, parameters);
         double maxDist = 10.0;
         if(parameters.get("maxdist") != null)
             maxDist = (double) parameters.get("maxdist");
         double targetWidth = 2.0;
         if(parameters.get("targetwidth") != null)
             targetWidth = (double) parameters.get("targetwidth");
-        Registry.getInstance().registerEvent(itemName, new InteractHookTargetEntity(effect, maxDist, targetWidth));
+        Registry.getInstance().registerEvent(id, new InteractHookTargetEntity(effect, maxDist, targetWidth));
         CommandUtil.saveConfig();
         return null;
     }

@@ -16,7 +16,7 @@ import org.cubeville.effects.managers.EffectWithLocation;
 import org.cubeville.effects.registry.Registry;
 import org.cubeville.effects.util.ItemUtil;
 
-public class HookCreateInteractTargetLocationCommand extends Command
+public class HookCreateInteractTargetLocationCommand extends HookCommand
 {
     public HookCreateInteractTargetLocationCommand() {
         super("hook create interact targetlocation");
@@ -43,8 +43,8 @@ public class HookCreateInteractTargetLocationCommand extends Command
 
         boolean origindir = flags.contains("origindir");
         
-        String itemName = ItemUtil.safeGetItemInMainHandName(player);        
-        Registry.getInstance().registerEvent(itemName, new InteractHookTargetLocation((List<Effect>) baseParameters.get(0), noTargetParameters, fixedPitch, zoffset, origindir));
+        Integer id = getHooklistID(player, parameters);
+        Registry.getInstance().registerEvent(id, new InteractHookTargetLocation((List<Effect>) baseParameters.get(0), noTargetParameters, fixedPitch, zoffset, origindir));
         CommandUtil.saveConfig();
         return null;
     }

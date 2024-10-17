@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HookCreateProjectileHitLocationCommand extends Command
+public class HookCreateProjectileHitLocationCommand extends HookCommand
 {
     public HookCreateProjectileHitLocationCommand() {
         super("hook create projectilehit location");
@@ -22,12 +22,9 @@ public class HookCreateProjectileHitLocationCommand extends Command
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
-        String itemName = ItemUtil.getItemInMainHandName(player);
-        if(itemName == null) {
-            throw new CommandExecutionException("No named item in hand!");
-        }
+        Integer id = getHooklistID(player, parameters);
 
-        Registry.getInstance().registerEvent(itemName, new ProjectileHitHookHitLocation((Effect) baseParameters.get(0)));
+        Registry.getInstance().registerEvent(id, new ProjectileHitHookHitLocation((Effect) baseParameters.get(0)));
         CommandUtil.saveConfig();
         return new CommandResponse("Hook created.");
     }
