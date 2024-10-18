@@ -16,6 +16,7 @@ public class ConvertConfigCommand extends Command {
     
     public ConvertConfigCommand() {
         super("convertconfig");
+        setPermission("fx.convertconfig");
     }
     
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) {
@@ -37,8 +38,13 @@ public class ConvertConfigCommand extends Command {
             if (type.equals("permissionList")) continue;
             Map<Object, Object> info = (Map<Object, Object>) serializedRegistry.get(type);
             for (Object belowKey : info.keySet()) {
-                if (belowKey instanceof Integer) continue;
-                String key = (String) belowKey;
+                String key;
+                if (belowKey instanceof Integer) {
+                    Integer i = (Integer) belowKey;
+                    key = i.toString();
+                } else {
+                    key = (String) belowKey;
+                }
                 allNames.add(key);
             }
         }
@@ -72,6 +78,7 @@ public class ConvertConfigCommand extends Command {
         serializedRegistry = newSerializedRegistry;
         Registry newRegistry = new Registry(serializedRegistry);
         config.set("Registry", newRegistry);
+        config.set("config-version", 2);
         EventListener.getInstance().setRegistry(newRegistry);
         config.set("HooklistRegistry", hr);
         
