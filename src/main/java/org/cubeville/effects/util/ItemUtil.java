@@ -41,12 +41,14 @@ public class ItemUtil
     
     public static boolean hasHooklist(ItemStack item) {
         if (item == null) return false;
+        if (item.getItemMeta() == null) return false;
         NamespacedKey nsKey = new NamespacedKey(Effects.getInstance(), "hooklists");
         return item.getItemMeta().getPersistentDataContainer().has(nsKey);
     }
     
     public static List<Integer> getHooklistIDs(ItemStack item) {
         if (item == null) return null;
+        if (item.getItemMeta() == null) return null;
         PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
         NamespacedKey nsKey = new NamespacedKey(Effects.getInstance(), "hooklists");
         
