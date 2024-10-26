@@ -49,6 +49,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
     private List<ParticleEffectComponent> components;
 
     // 1st int: runningEffectId, 2nd int: Component, 3rd int: Timeline-No
+    // TODO: Better data structure, per id and per component there can be only one instance
     private HashMap<Integer, HashMap<Integer, HashMap<Integer, ArmorStand>>> armorstands = new HashMap<>();
     private HashMap<Integer, HashMap<Integer, HashMap<Integer, Display>>> displayentities = new HashMap<>();
 
@@ -89,7 +90,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
     }
 
     public void play(Location location) {
-        play(0, new StaticParticleEffectLocationCalculator(location), null, EffectManager.getNewRunningEffectId());
+        play(0, new StaticParticleEffectLocationCalculator(location), null, EffectManager.getInstance().getNewRunningEffectId());
     }
 
     private void removeArmorStand(ArmorStand as) {
@@ -214,21 +215,27 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                             }
 
                             Display entity = tlm.get(timelineNo);
+
+                            if(entity != null && entity.isValid() == false) {
+                                entity.remove();
+                                tlm.remove(timelineNo);
+                                entity = null;
+                            }
+                            
                             if(entity == null) {
                                 World world = displayEntityLocation.getWorld();
                                 if(properties.isItemDisplay()) {
                                     ItemDisplay i = (ItemDisplay) world.spawnEntity(displayEntityLocation, EntityType.ITEM_DISPLAY);
-                                    i.setItemStack(properties.getItemData());
+                                    i.setItemStack(properties.getItemData(effectStep));
                                     entity = i;
                                 }
                                 else if(properties.isTextDisplay()) {
                                     TextDisplay t = (TextDisplay) world.spawnEntity(displayEntityLocation, EntityType.TEXT_DISPLAY);
-                                    t.setText(properties.getText());
+                                    t.setText(properties.getText(effectStep));
                                     t.setAlignment(TextDisplay.TextAlignment.CENTER);
-                                    t.setBackgroundColor(Color.fromRGB(0, 0, 0));
                                     t.setTextOpacity((byte) 255); // Fully opaque
                                     t.setSeeThrough(false);
-                                    t.setShadowed(false);
+                                    t.setShadowed(true);
                                     entity = t;
                                 }
                                 entity.setBrightness(new Display.Brightness(15, 15));
@@ -239,8 +246,21 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                             }
                             else {
                                 entity.teleport(displayEntityLocation);
+                                if(properties.isItemDataSwitch(effectStep)) {
+                                    if(properties.isItemDisplay())
+                                        ((ItemDisplay) entity).setItemStack(properties.getItemData(effectStep));
+                                    else if(properties.isTextDisplay())
+                                        ((TextDisplay) entity).setText(properties.getText(effectStep));
+                                }
                             }
 
+                            if(entity.getType() == EntityType.TEXT_DISPLAY) {
+                                ((TextDisplay) entity).setBackgroundColor(Color.fromARGB((int) properties.textBackgroundAlpha.getValue(effectStep),
+                                                                                         (int) properties.textBackgroundRed.getValue(effectStep),
+                                                                                         (int) properties.textBackgroundGreen.getValue(effectStep),
+                                                                                         (int) properties.textBackgroundBlue.getValue(effectStep)));
+                            }
+                            
                             org.joml.Vector3f translation =
                                 new org.joml.Vector3f((float) properties.moveX.getValue(effectStep),
                                                       (float) properties.moveY.getValue(effectStep),

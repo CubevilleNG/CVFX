@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
@@ -26,7 +25,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
-import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.Effects;
 import org.cubeville.effects.hooks.BlockBreakHook;
 import org.cubeville.effects.hooks.DamageOtherEntityHook;
@@ -37,6 +35,8 @@ import org.cubeville.effects.hooks.ProjectileHitHook;
 import org.cubeville.effects.hooks.ProjectileLaunchHook;
 import org.cubeville.effects.managers.Effect;
 import org.cubeville.effects.util.ItemUtil;
+import org.cubeville.effects.managers.EffectManager;
+import org.cubeville.effects.hooklists.HooklistRegistry;
 
 @SerializableAs("Registry")
 public class Registry implements ConfigurationSerializable
@@ -239,8 +239,12 @@ public class Registry implements ConfigurationSerializable
 
     public void processBlockBreakEvent(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        List<Integer> ids = ItemUtil.getHooklistIDs(event.getPlayer().getInventory().getItemInMainHand());
+
+        ItemStack heldItem = event.getPlayer().getInventory().getItemInMainHand();
+        if(heldItem == null) return;
+        List<Integer> ids = ItemUtil.getHooklistIDs(heldItem);
         if (ids == null) return;
+
         for (Integer id : ids) {
             if (blockBreakEvents.containsKey(id)) {
                 RegistryHook<BlockBreakHook> rh = blockBreakEvents.get(id);
@@ -253,7 +257,7 @@ public class Registry implements ConfigurationSerializable
             }
         }
     }
-    
+
     public void deregisterInteractEvent(Integer id, int index) {
         deregisterEvent(interactEvents, id, index);
     }
@@ -446,5 +450,53 @@ public class Registry implements ConfigurationSerializable
         }
     }
     
+    public void cleanHooklists() {
+
+        showHooklistInfo();
+        
+        for(String key: eventMaps.keySet()) {
+            Map<Integer, RegistryHook<Hook>> hooklists = eventMaps.get(key);
+            Set<Integer> hooklistIds = hooklists.keySet();
+            Set<Integer> deleteIds = new HashSet<>();
+            for(int id: hooklistIds) {
+                RegistryHook<Hook> rh = hooklists.get(id);
+                List<Hook> hooks = rh.getHooks();
+                boolean isused = false;
+
+                for(Hook h: hooks) {
+                    for(Effect e: EffectManager.getInstance().getEffects()) {
+                        if(h.usesEffect(e)) {
+                            isused = true;
+                        }
+                    }
+
+                }
+
+                if(isused == false) {
+                    deleteIds.add(id);
+                    System.out.println("Delete hook " + id);
+                }
+            }
+
+            for(int id: deleteIds) {
+                hooklists.remove(id);
+                HooklistRegistry.getInstance().removeHooklist(id);
+            }
+        }
+
+        showHooklistInfo();
+
+    }
+
+    public void showHooklistInfo() {
+        System.out.println("Hooklist list:");
+        for(String key: eventMaps.keySet()) {
+            Map<Integer, RegistryHook<Hook>> hooklists = eventMaps.get(key);
+            Set<Integer> hooklistIds = hooklists.keySet();
+            for(int id: hooklistIds) {
+                System.out.println("Found hooklist id " + id);
+            }
+        }
+    }
     
 }

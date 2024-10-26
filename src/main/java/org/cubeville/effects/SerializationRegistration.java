@@ -29,6 +29,7 @@ public class SerializationRegistration
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.CommandWithLivingEntityEffect.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.CommandWithLocationEffect.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.DisplayEntityProperties.class);
+        ConfigurationSerialization.registerClass(org.cubeville.effects.managers.NPCEffect.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.ParticleEffect.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.ParticleEffectComponent.class);
         ConfigurationSerialization.registerClass(org.cubeville.effects.managers.ParticleEffectTimelineEntry.class);

@@ -122,14 +122,14 @@ public class InteractHookParticlePlayer implements InteractHook
 	loc.setY(loc.getY() + yOffset);
         if(player.isSneaking()) loc.setY(loc.getY() + ySneakShift);
 	if(fixedPitch) loc.setPitch((float)pitch);
-	new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill, stopAt, followPlayer).runTaskTimer(Effects.getInstance(), 1, 1);
+	new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill, stopAt, followPlayer, 0, null).runTaskTimer(Effects.getInstance(), 1, 1);
     }
     
     public void playAt(Location location, int stopAt) {
         Location loc = location.clone();
         loc.setY(loc.getY() + yOffset);
         if(fixedPitch) loc.setPitch((float)pitch);
-	new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopAt, false).runTaskTimer(Effects.getInstance(), 1, 1);
+	new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopAt, false, 0, null).runTaskTimer(Effects.getInstance(), 1, 1);
     }
     
     public boolean usesEffect(Effect effect) {

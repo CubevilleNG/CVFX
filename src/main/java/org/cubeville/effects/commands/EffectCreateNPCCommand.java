@@ -4,28 +4,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import org.cubeville.commons.commands.Command;
 import org.cubeville.commons.commands.CommandExecutionException;
-import org.cubeville.commons.commands.CommandParameterFloat;
-import org.cubeville.commons.commands.CommandParameterEnum;
 import org.cubeville.commons.commands.CommandParameterInteger;
 import org.cubeville.commons.commands.CommandParameterString;
 import org.cubeville.commons.commands.CommandResponse;
-import org.cubeville.effects.managers.EffectManager;
-import org.cubeville.effects.managers.SoundEffect;
 
-public class EffectCreateSoundCommand extends Command
+import org.cubeville.effects.managers.EffectManager;
+import org.cubeville.effects.managers.NPCEffect;
+
+public class EffectCreateNPCCommand extends Command
 {
-    public EffectCreateSoundCommand() {
-        super("effect create sound");
+    public EffectCreateNPCCommand() {
+        super("effect create npc");
         addBaseParameter(new CommandParameterString());
-        addBaseParameter(new CommandParameterEnum(Sound.class));
-        addOptionalBaseParameter(new CommandParameterFloat());
-        addParameter("delay", true, new CommandParameterInteger());
-        addParameter("volume", true, new CommandParameterFloat());
+        addBaseParameter(new CommandParameterInteger());
+        addFlag("spawn");
+        addFlag("despawn");
+        addFlag("teleport");
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
@@ -35,23 +33,21 @@ public class EffectCreateSoundCommand extends Command
             throw new CommandExecutionException("Effect with name " + name + " already exists!");
         };
         
-        float pitch = 1.0F;
-        if(baseParameters.size() == 3) pitch = (Float) baseParameters.get(2);
+        int id = (int) baseParameters.get(1);
 
-        int delay = 0;
-        if(parameters.containsKey("delay")) {
-            delay = (Integer) parameters.get("delay");
-        }
+        NPCEffect effect = new NPCEffect(name, id);
 
-        float volume = 1.0F;
-        if(parameters.containsKey("volume")) {
-            volume = (float) parameters.get("volume");
-        }
+        if(flags.contains("spawn"))
+            effect.setSpawn(true, player.getLocation());
+        if(flags.contains("despawn"))
+            effect.setDespawn(true);
+        if(flags.contains("teleport"))
+            effect.setTeleport(true);
         
-        SoundEffect effect = new SoundEffect(name, (Sound) baseParameters.get(1), pitch, delay, volume);
         EffectManager.getInstance().addEffect(effect);
         CommandUtil.saveConfig();
 
         return null;
+
     }
 }

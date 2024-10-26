@@ -4,7 +4,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.cubeville.effects.Effects;
 import org.cubeville.effects.commands.CommandUtil;
-import org.enginehub.linbus.stream.token.LinToken;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -60,8 +59,8 @@ public class HooklistRegistry implements ConfigurationSerializable {
         hooklistMap.put(id, hooklist);
     }
     
-    public void deregister(Integer id, Hooklist hooklist) {
-        hooklistMap.put(id, hooklist);
+    public void deregister(Integer id) {
+        hooklistMap.remove(id);
     }
     
     public boolean containsID(Integer id) {
@@ -70,6 +69,10 @@ public class HooklistRegistry implements ConfigurationSerializable {
     
     public Hooklist getHooklist(Integer id) {
         return hooklistMap.get(id);
+    }
+
+    public void removeHooklist(Integer id) {
+        hooklistMap.remove(id);
     }
     
     @Nullable

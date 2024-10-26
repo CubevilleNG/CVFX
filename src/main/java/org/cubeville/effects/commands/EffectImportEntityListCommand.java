@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.util.Transformation;
 import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -42,37 +42,69 @@ public class EffectImportEntityListCommand extends Command
 
         int cnt = 0;
         for(Entity e: entities) {
-            if(e.getType() != EntityType.ITEM_DISPLAY) continue;
-            ItemDisplay id = (ItemDisplay) e;
-            
-            cnt++;
-            ParticleEffectComponent component = new ParticleEffectComponent();
-            effect.addComponent(component);
+            if(e instanceof ItemDisplay) {
+                ItemDisplay id = (ItemDisplay) e;
 
-            component.setParticle(null);
-            DisplayEntityProperties dep = component.createOrGetDisplayEntityProperties();
-            dep.setItemData(id.getItemStack());
+                ParticleEffectComponent component = new ParticleEffectComponent();
+                effect.addComponent(component);
+                
+                component.setParticle(null);
+                DisplayEntityProperties dep = component.createOrGetDisplayEntityProperties();
+                dep.setItemData(id.getItemStack());
+                
+                Transformation t = id.getTransformation();
+                dep.moveX = new ConstantValueSource(t.getTranslation().x);
+                dep.moveY = new ConstantValueSource(t.getTranslation().y);
+                dep.moveZ = new ConstantValueSource(t.getTranslation().z);
+                dep.scaleX = new ConstantValueSource(t.getScale().x);
+                dep.scaleY = new ConstantValueSource(t.getScale().y);
+                dep.scaleZ = new ConstantValueSource(t.getScale().z);
+                AxisAngle4f lr = new AxisAngle4f(t.getLeftRotation());
+                dep.rotateLeftAngle = new ConstantValueSource(Math.toDegrees(lr.angle));
+                dep.rotateLeftX = new ConstantValueSource(lr.x);
+                dep.rotateLeftY = new ConstantValueSource(lr.y);
+                dep.rotateLeftZ = new ConstantValueSource(lr.z);
+                AxisAngle4f rr = new AxisAngle4f(t.getRightRotation());
+                dep.rotateRightAngle = new ConstantValueSource(Math.toDegrees(rr.angle));
+                dep.rotateRightX = new ConstantValueSource(rr.x);
+                dep.rotateRightY = new ConstantValueSource(rr.y);
+                dep.rotateRightZ = new ConstantValueSource(rr.z);
 
-            Transformation t = id.getTransformation();
-            dep.moveX = new ConstantValueSource(t.getTranslation().x);
-            dep.moveY = new ConstantValueSource(t.getTranslation().y);
-            dep.moveZ = new ConstantValueSource(t.getTranslation().z);
-            dep.scaleX = new ConstantValueSource(t.getScale().x);
-            dep.scaleY = new ConstantValueSource(t.getScale().y);
-            dep.scaleZ = new ConstantValueSource(t.getScale().z);
-            AxisAngle4f lr = new AxisAngle4f(t.getLeftRotation());
-            dep.rotateLeftAngle = new ConstantValueSource(Math.toDegrees(lr.angle));
-            dep.rotateLeftX = new ConstantValueSource(lr.x);
-            dep.rotateLeftY = new ConstantValueSource(lr.y);
-            dep.rotateLeftZ = new ConstantValueSource(lr.z);
-            AxisAngle4f rr = new AxisAngle4f(t.getRightRotation());
-            dep.rotateRightAngle = new ConstantValueSource(Math.toDegrees(rr.angle));
-            dep.rotateRightX = new ConstantValueSource(rr.x);
-            dep.rotateRightY = new ConstantValueSource(rr.y);
-            dep.rotateRightZ = new ConstantValueSource(rr.z);
+                cnt++;
+            }
+            else if(e instanceof TextDisplay) {
+                TextDisplay td = (TextDisplay) e;
+
+                ParticleEffectComponent component = new ParticleEffectComponent();
+                effect.addComponent(component);
+                
+                component.setParticle(null);
+                DisplayEntityProperties dep = component.createOrGetDisplayEntityProperties();
+                dep.setText(td.getText());
+
+                Transformation t = td.getTransformation();
+                dep.moveX = new ConstantValueSource(t.getTranslation().x);
+                dep.moveY = new ConstantValueSource(t.getTranslation().y);
+                dep.moveZ = new ConstantValueSource(t.getTranslation().z);
+                dep.scaleX = new ConstantValueSource(t.getScale().x);
+                dep.scaleY = new ConstantValueSource(t.getScale().y);
+                dep.scaleZ = new ConstantValueSource(t.getScale().z);
+                AxisAngle4f lr = new AxisAngle4f(t.getLeftRotation());
+                dep.rotateLeftAngle = new ConstantValueSource(Math.toDegrees(lr.angle));
+                dep.rotateLeftX = new ConstantValueSource(lr.x);
+                dep.rotateLeftY = new ConstantValueSource(lr.y);
+                dep.rotateLeftZ = new ConstantValueSource(lr.z);
+                AxisAngle4f rr = new AxisAngle4f(t.getRightRotation());
+                dep.rotateRightAngle = new ConstantValueSource(Math.toDegrees(rr.angle));
+                dep.rotateRightX = new ConstantValueSource(rr.x);
+                dep.rotateRightY = new ConstantValueSource(rr.y);
+                dep.rotateRightZ = new ConstantValueSource(rr.z);
+
+                cnt++;
+            }
         }
 
-        if(cnt == 0) throw new CommandExecutionException("No item displays in selection!");
+        if(cnt == 0) throw new CommandExecutionException("No item or text displays in selection!");
 
         EffectManager.getInstance().addEffect(effect);
         CommandUtil.saveConfig();

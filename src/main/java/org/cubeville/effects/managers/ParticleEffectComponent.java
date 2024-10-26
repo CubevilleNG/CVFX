@@ -259,10 +259,11 @@ public class ParticleEffectComponent implements ConfigurationSerializable
             DisplayEntityProperties p = displayEntityProperties;
 
             String ai = "  §eDisplay entity:§r ";
-            if(p.getItemData() != null)
-                ai += "Item (" + p.getItemData().getType() + ")";
-            else if(p.getText() != null)
-                ai += "Text (" + p.getText() + "§r)";
+            if(p.isItemDisplay()) {
+                ai += "Item (" + p.getItemData(0).getType() + ")"; // TODO show multiple items
+            }
+            else if(p.isTextDisplay())
+                ai += "Text (" + p.getText(0) + "§r)";
             ret.add(ai);
 
             if(!p.moveX.getInfo(false).equals("Constant 0.0"))

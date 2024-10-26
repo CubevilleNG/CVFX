@@ -37,11 +37,31 @@ public class ParticlePlayerCommand extends BaseCommand
         addBaseParameter(new CommandParameterDouble()); // yaw
         addBaseParameter(new CommandParameterDouble()); // pitch
         addParameter("stopat", true, new CommandParameterInteger());
+        addParameter("indefinitely", true, new CommandParameterInteger());
+        addParameter("group", true, new CommandParameterString());
+        addFlag("exclusive");
 	addFlag("silent");
     }
 
     public CommandResponse execute(CommandSender player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
+
         String name = (String) baseParameters.get(0);
+
+        String group = (String) parameters.get("group");
+        if(flags.contains("exclusive")) {
+            if(group == null) {
+                if(EffectManager.getInstance().isEffectRunning(name) == true) {
+                    if(flags.contains("silent"))
+                        return new CommandResponse("");
+                    else
+                        throw new CommandExecutionException("Effect already running.");
+                }
+            }
+            else {
+                EffectManager.getInstance().abortRunningGroupEffects(group);
+            }
+        }
+        
         ParticleEffect effect;
         {
             Effect e = EffectManager.getInstance().getEffectByName(name);
@@ -49,6 +69,7 @@ public class ParticlePlayerCommand extends BaseCommand
             if(!(e instanceof ParticleEffect)) throw new CommandExecutionException("Effect " + name + " is not a particle effect!");
             effect = (ParticleEffect) e;
         }
+
         double stepsPerTick = (Double) baseParameters.get(1);
         double speed = (Double) baseParameters.get(2);
         String worldName = (String) baseParameters.get(3);
@@ -64,7 +85,11 @@ public class ParticlePlayerCommand extends BaseCommand
         if(parameters.containsKey("stopat"))
             stopat = (int) parameters.get("stopat");
 
-        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopat, false).runTaskTimer(Effects.getInstance(), 1, 1);
+        int indefinitely = 0;
+        if(parameters.containsKey("indefinitely"))
+            indefinitely = (int) parameters.get("indefinitely");
+
+        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopat, false, indefinitely, group).runTaskTimer(Effects.getInstance(), 1, 1);
 
 	if(flags.contains("silent")) {
 	    return new CommandResponse("");

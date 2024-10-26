@@ -24,7 +24,7 @@ public class ParticleEffectProjectileRunnable extends BukkitRunnable implements 
         else
             player = null;
         step = 0;
-        runningEffectId = EffectManager.getNewRunningEffectId();
+        runningEffectId = EffectManager.getInstance().getNewRunningEffectId();
         Registry.getInstance().addProjectileHitAction(projectile, this);
     }
 

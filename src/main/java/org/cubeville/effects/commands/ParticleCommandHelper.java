@@ -68,7 +68,13 @@ public class ParticleCommandHelper
         command.addParameter("armorstandsmall", true, new CommandParameterBoolean());
 
         command.addFlag("itemdisplay");
+        command.addParameter("additemdisplay", true, new CommandParameterInteger());
         command.addParameter("textdisplay", true, new CommandParameterString());
+        command.addParameter("addtextdisplay", true, new CommandParameterString());
+        command.addParameter("textbgalpha", true, new CommandParameterValueSource());
+        command.addParameter("textbgred", true, new CommandParameterValueSource());
+        command.addParameter("textbggreen", true, new CommandParameterValueSource());
+        command.addParameter("textbgblue", true, new CommandParameterValueSource());
         command.addParameter("displaymovex", true, new CommandParameterValueSource());
         command.addParameter("displaymovey", true, new CommandParameterValueSource());
         command.addParameter("displaymovez", true, new CommandParameterValueSource());
@@ -307,10 +313,33 @@ public class ParticleCommandHelper
             }
         }
 
+        if(parameters.containsKey("additemdisplay")) {
+            ItemStack item = player.getInventory().getItemInMainHand();
+            int startStep = (int) parameters.get("additemdisplay");
+            component.createOrGetDisplayEntityProperties().addItemData(item, startStep);
+        }
+        
         if(parameters.containsKey("textdisplay")) {
             String text = ColorUtils.addColor((String) parameters.get("textdisplay"));
             component.createOrGetDisplayEntityProperties().setText(text);
         }
+
+        if(parameters.containsKey("addtextdisplay")) {
+            String t = (String) parameters.get("addtextdisplay");
+            int pos = t.indexOf(';');
+            int startStep = Integer.valueOf(t.substring(0, pos));
+            String text = ColorUtils.addColor(t.substring(pos + 1));
+            component.createOrGetDisplayEntityProperties().addText(text, startStep);
+        }
+
+        if(parameters.containsKey("textbgalpha"))
+            component.createOrGetDisplayEntityProperties().textBackgroundAlpha = (ValueSource) parameters.get("textbgalpha");
+        if(parameters.containsKey("textbgred"))
+            component.createOrGetDisplayEntityProperties().textBackgroundRed = (ValueSource) parameters.get("textbgred");
+        if(parameters.containsKey("textbggreen"))
+            component.createOrGetDisplayEntityProperties().textBackgroundGreen = (ValueSource) parameters.get("textbggreen");
+        if(parameters.containsKey("textbgblue"))
+            component.createOrGetDisplayEntityProperties().textBackgroundBlue = (ValueSource) parameters.get("textbgblue");
 
         if(parameters.containsKey("displaymovex"))
             component.createOrGetDisplayEntityProperties().moveX = (ValueSource) parameters.get("displaymovex");

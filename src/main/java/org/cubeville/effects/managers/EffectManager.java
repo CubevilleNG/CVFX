@@ -14,16 +14,57 @@ public class EffectManager implements ConfigurationSerializable
 {
     List<Effect> effects;
     static EffectManager instance;
-    private static int runningEffectId = 0;
-
+    private int runningEffectId = 0;
+    List<ParticleEffectTimedRunnable> runningEffects = new ArrayList<>();
+    
     public static EffectManager getInstance() {
         return instance;
     }
 
-    public static int getNewRunningEffectId() {
+    public int getNewRunningEffectId() {
         return runningEffectId++;
     }
-    
+
+    public void registerRunningEffect(ParticleEffectTimedRunnable runnable) {
+        runningEffects.add(runnable);
+    }
+
+    public void deregisterRunningEffect(ParticleEffectTimedRunnable runnable) {
+        runningEffects.remove(runnable);
+    }
+
+    public List<ParticleEffectTimedRunnable> getRunningEffects() {
+        return runningEffects;
+    }
+
+    public boolean abortRunningEffect(int id) {
+        for(ParticleEffectTimedRunnable r: runningEffects) {
+            if(r.getId() == id) {
+                r.abort();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isEffectRunning(String name) {
+        for(ParticleEffectTimedRunnable r: runningEffects) {
+            if(r.getEffect().getName().equals(name))
+                return true;
+        }
+        return false;
+    }
+
+    public void abortRunningGroupEffects(String group) {
+        if(group == null) return;
+        int size = runningEffects.size();
+        for(int i = size - 1; i >= 0; i--) {
+            if(runningEffects.get(i).getGroup() != null && runningEffects.get(i).getGroup().equals(group)) {
+                runningEffects.get(i).abort();
+            }
+        }
+    }
+
     public EffectManager(Map<String, Object> config) {
         effects = (List<Effect>) config.get("effects");
         instance = this;
@@ -34,7 +75,7 @@ public class EffectManager implements ConfigurationSerializable
         ret.put("effects", effects);
         return ret;
     }
-    
+
     public EffectManager() {
         effects = new ArrayList<>();
         instance = this;
@@ -64,6 +105,10 @@ public class EffectManager implements ConfigurationSerializable
         return ret;
     }
 
+    public List<Effect> getEffects() {
+        return effects;
+    }
+    
     public Effect getEffectById(int id) {
         return effects.get(id);
     }

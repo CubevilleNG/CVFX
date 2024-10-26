@@ -5,7 +5,7 @@ version: 1.21
 api-version: 1.21
 
 depend: [CVTools]
-softdepend: [CVEntityEdit]
+softdepend: [CVEntityEdit,Citizens]
 
 commands:
   fx:

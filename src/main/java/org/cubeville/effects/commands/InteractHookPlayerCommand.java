@@ -55,5 +55,5 @@ public class InteractHookPlayerCommand extends BaseCommand
             return new CommandResponse("");
         else
             return null;
-    }            
+    }
 }

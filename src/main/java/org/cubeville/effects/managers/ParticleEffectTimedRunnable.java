@@ -18,10 +18,12 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
     private ParticleEffectLocationCalculator locationCalculator;
     private final int runningEffectId;
     private final int stopAt;
+    private int runIndefinitely;
+    private String group;
     
-    public ParticleEffectTimedRunnable(JavaPlugin plugin, Player player, ParticleEffect effect, double stepsPerTick, double speed, Location location, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, int stopAt, boolean followPlayerLocationCalculator)
+    public ParticleEffectTimedRunnable(JavaPlugin plugin, Player player, ParticleEffect effect, double stepsPerTick, double speed, Location location, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, int stopAt, boolean followPlayerLocationCalculator, int runIndefinitely, String group)
     {
-        runningEffectId = EffectManager.getNewRunningEffectId();
+        runningEffectId = EffectManager.getInstance().getNewRunningEffectId();
         if(followPlayerLocationCalculator)
             locationCalculator = new FollowPlayerEffectLocationCalculator(player);
         else
@@ -31,24 +33,55 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
 	this.stepsPerTick = stepsPerTick;
         this.player = player;
         this.stopAt = stopAt;
+        this.runIndefinitely = runIndefinitely;
+        this.group = group;
 	ticks = 0;
 	step = 0;
+        EffectManager.getInstance().registerRunningEffect(this);
+    }
+
+    public int getId() {
+        return runningEffectId;
+    }
+    
+    public Effect getEffect() {
+        return effect;
+    }
+
+    public void abort() {
+        effect.abort(runningEffectId);
+        EffectManager.getInstance().deregisterRunningEffect(this);
+        this.cancel();
     }
 
     @Override
     public void run() {
+
 	ticks++;
+
         if(stopAt > 0 && ticks >= stopAt) {
             effect.abort(runningEffectId);
+            EffectManager.getInstance().deregisterRunningEffect(this);
             this.cancel();
             return;
         }
 
 	while(step + 1 < ticks * stepsPerTick) {
+
             if(!effect.play(step++, locationCalculator, player, runningEffectId)) {
+                EffectManager.getInstance().deregisterRunningEffect(this);
                 this.cancel();
                 return;
             }
+
+            if(runIndefinitely > 0 && step >= runIndefinitely) {
+                step = 0;
+                ticks = 0;
+                return;
+            }
+            
         }
     }
+
+    public String getGroup() { return group; }
 }
