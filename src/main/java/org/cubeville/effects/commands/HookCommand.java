@@ -26,7 +26,7 @@ public abstract class HookCommand extends Command {
         addParameter("id", true, new CommandParameterInteger());
     }
     
-    protected Integer getHooklistID(Player player, Map<String, Object> parameters) throws CommandExecutionException {
+    protected Integer getHooklistID(Player player, Map<String, Object> parameters, Boolean createNew) throws CommandExecutionException {
         Integer id;
         if (!parameters.containsKey("id")) {
             ItemStack item = player.getInventory().getItemInMainHand();
@@ -34,16 +34,23 @@ public abstract class HookCommand extends Command {
             if (item.getType() == null) throw new CommandExecutionException("You are not holding an item!");
             id = ItemUtil.getFirstHooklistID(item);
             if (id == null) {
-                id = HooklistRegistry.getInstance().createNewHooklist();
-                ItemUtil.addHooklist(item, id);
-                player.sendMessage("Created new hooklist " + id);
+                if (createNew) {
+                    id = HooklistRegistry.getInstance().createNewHooklist();
+                    ItemUtil.addHooklist(item, id);
+                    player.sendMessage("Created new hooklist " + id);
+                } else {
+                    throw new CommandExecutionException("There are no hooklists on this item!");
+                }
             }
         } else {
             id = (Integer) parameters.get("id");
             if (!HooklistRegistry.getInstance().containsID(id)) throw new CommandExecutionException("Invalid hooklist ID!");
         }
         
-        
         return id;
+    }
+    
+    protected Integer getHooklistID(Player player, Map<String, Object> parameters) throws CommandExecutionException {
+        return getHooklistID(player, parameters, true);
     }
 }
