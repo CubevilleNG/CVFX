@@ -24,7 +24,7 @@ public class HookListCommand extends HookCommand
             for(String h: hooks) ret.addMessage(h);
         }
         else {
-            Integer id = getHooklistID(player, parameters);
+            Integer id = getHooklistID(player, parameters, false);
             ret.addMessage("Hooks for hooklist " + id + ":");
             List<String> hooks = Registry.getInstance().getHookList(id);
             for(String h: hooks) ret.addMessage(h);
