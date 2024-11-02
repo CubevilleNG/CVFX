@@ -58,14 +58,14 @@ public class ItemUtil
             return null;
         }
     }
-    
+
     public static Integer getFirstHooklistID(ItemStack item) {
         if (item == null) return null;
         List<Integer> ids = getHooklistIDs(item);
         if (ids == null) return null;
         return new ArrayList<>(ids).get(0);
     }
-    
+
     public static void addHooklist(ItemStack item, Integer id) {
         NamespacedKey nsKey = new NamespacedKey(Effects.getInstance(), "hooklists");
         ItemMeta meta = item.getItemMeta();

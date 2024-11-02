@@ -1,5 +1,7 @@
 package org.cubeville.effects.hooks;
 
+import org.bukkit.entity.Projectile;
+import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -32,6 +34,9 @@ public class ProjectileLaunchHookCancelEvent implements ProjectileLaunchHook
         }
     }
 
+    public void runAt(Location location, Projectile projectile) {
+    }
+    
     public boolean usesEffect(Effect effect) {
         return false;
     }

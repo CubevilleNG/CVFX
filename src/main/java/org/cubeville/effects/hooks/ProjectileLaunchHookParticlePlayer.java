@@ -3,6 +3,7 @@ package org.cubeville.effects.hooks;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -38,6 +39,10 @@ public class ProjectileLaunchHookParticlePlayer implements ProjectileLaunchHook
 
     public void process(ProjectileLaunchEvent event) {
         Projectile projectile = (Projectile) event.getEntity();
+        new ParticleEffectProjectileRunnable(effect, projectile).runTaskTimer(Effects.getInstance(), 1, 1);
+    }
+
+    public void runAt(Location location, Projectile projectile) {
         new ParticleEffectProjectileRunnable(effect, projectile).runTaskTimer(Effects.getInstance(), 1, 1);
     }
 

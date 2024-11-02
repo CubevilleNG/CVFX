@@ -26,6 +26,7 @@ public class DisplayEntityProperties implements ConfigurationSerializable
     public ValueSource textBackgroundRed = new ConstantValueSource(0);
     public ValueSource textBackgroundGreen = new ConstantValueSource(0);
     public ValueSource textBackgroundBlue = new ConstantValueSource(0);
+    public ValueSource textOpacity = new ConstantValueSource(255);
 
     public ValueSource moveX = new ConstantValueSource(0);
     public ValueSource moveY = new ConstantValueSource(0);
@@ -110,6 +111,9 @@ public class DisplayEntityProperties implements ConfigurationSerializable
             textBackgroundGreen = (ValueSource) config.get("textBackgroundGreen");
             textBackgroundBlue = (ValueSource) config.get("textBackgroundBlue");
         }
+        if(config.get("textOpacity") != null) {
+            textOpacity = (ValueSource) config.get("textOpacity");
+        }
     }
 
     public Map<String, Object> serialize() {
@@ -142,6 +146,7 @@ public class DisplayEntityProperties implements ConfigurationSerializable
             ret.put("textBackgroundRed", textBackgroundRed);
             ret.put("textBackgroundGreen", textBackgroundGreen);
             ret.put("textBackgroundBlue", textBackgroundBlue);
+            ret.put("textOpacity", textOpacity);
         }
         
         return ret;

@@ -3,6 +3,7 @@ package org.cubeville.effects.hooks;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -40,6 +41,10 @@ public class ProjectileLaunchHookPlayerLocation implements ProjectileLaunchHook
         effect.play(((Player)shooter).getLocation());
     }
 
+    public void runAt(Location location, Projectile projectile) {
+        effect.play(location);
+    }
+    
     public boolean usesEffect(Effect effect) {
         return effect == this.effect;
     }

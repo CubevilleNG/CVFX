@@ -21,6 +21,7 @@ import net.citizensnpcs.api.trait.trait.Equipment.EquipmentSlot;
 public class EffectModifyNPCCommand extends Command {
     public EffectModifyNPCCommand() {
         super("effect modify");
+        setPermission("fx.npc");
         addBaseParameter(new CommandParameterEffect(NPCEffect.class));
         addParameter("spawn", true, new CommandParameterBoolean());
         addParameter("teleport", true, new CommandParameterBoolean());

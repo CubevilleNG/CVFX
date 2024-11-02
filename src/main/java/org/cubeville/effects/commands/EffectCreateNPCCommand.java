@@ -19,11 +19,13 @@ public class EffectCreateNPCCommand extends Command
 {
     public EffectCreateNPCCommand() {
         super("effect create npc");
+        setPermission("fx.npc");
         addBaseParameter(new CommandParameterString());
         addBaseParameter(new CommandParameterInteger());
         addFlag("spawn");
         addFlag("despawn");
         addFlag("teleport");
+        addFlag("clearequipment");
     }
 
     public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
@@ -43,7 +45,9 @@ public class EffectCreateNPCCommand extends Command
             effect.setDespawn(true);
         if(flags.contains("teleport"))
             effect.setTeleport(true);
-        
+        if(flags.contains("clearequipment"))
+           effect.setClearEquipment(true);
+           
         EffectManager.getInstance().addEffect(effect);
         CommandUtil.saveConfig();
 

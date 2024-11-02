@@ -185,11 +185,14 @@ public class Effects extends JavaPlugin {
         //commandParser.addCommand(new CleanHooklists());
         commandParser.addCommand(new ConvertConfigCommand());
         commandParser.addCommand(new ConvertItemCommand());
+        commandParser.addCommand(new CreateOrSetPermissionCommand());
         commandParser.addCommand(new EffectCreateBrokenWandEffectCommand());
         commandParser.addCommand(new EffectCreateCommandWithLivingEntityCommand());
         commandParser.addCommand(new EffectCreateCommandWithLocationCommand());
+        commandParser.addCommand(new EffectCreateInteractHookPlayerCommand());
         commandParser.addCommand(new EffectCreateNPCCommand());
         commandParser.addCommand(new EffectCreateParticleCommand());
+        commandParser.addCommand(new EffectCreateProjectileLaunchHookPlayerCommand());
         commandParser.addCommand(new EffectCreatePiercingCommand());
         commandParser.addCommand(new EffectCreatePotionEffectCommand());
         commandParser.addCommand(new EffectCreateSoundCommand());
@@ -247,6 +250,8 @@ public class Effects extends JavaPlugin {
         commandParser.addCommand(new PermissionAddCommand());
         commandParser.addCommand(new PermissionListCommand());
         commandParser.addCommand(new PermissionRemoveCommand());
+        commandParser.addCommand(new ProjectileParticlePlayerCommand());
+        commandParser.addCommand(new ProjectileLaunchHookPlayerCommand());
         CVTools.getInstance().registerCommandParser("fx", "fx.admin", commandParser);
     }
 }

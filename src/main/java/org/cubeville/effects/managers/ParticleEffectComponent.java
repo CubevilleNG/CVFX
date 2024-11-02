@@ -11,6 +11,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.util.Vector;
 import org.cubeville.effects.managers.modifier.CoordinateModifier;
+import org.cubeville.effects.managers.modifier.CoordinateModifierMove;
 import org.cubeville.effects.managers.sources.coordinate.ConstantCoordinateSource;
 import org.cubeville.effects.managers.sources.coordinate.CoordinateSource;
 import org.cubeville.effects.managers.sources.value.ConstantValueSource;
@@ -176,6 +177,23 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         modifiers.add(coordinateModifier);
     }
 
+    public void replaceOrAddModifier(CoordinateModifier coordinateModifier) {
+        for(int i = 0; i < modifiers.size(); i++) {
+            if(modifiers.get(i) instanceof CoordinateModifierMove && coordinateModifier instanceof CoordinateModifierMove) {
+                CoordinateModifierMove mv = (CoordinateModifierMove) coordinateModifier;
+                if(mv.isSameType((CoordinateModifierMove) modifiers.get(i))) {
+                    modifiers.set(i, coordinateModifier);
+                    return;
+                }
+            }
+            else if(modifiers.get(i).getClass() == coordinateModifier.getClass()) {
+                modifiers.set(i, coordinateModifier);
+                return;
+            }
+        }
+        addModifier(coordinateModifier);
+    }
+    
     public void deleteModifiers() {
         modifiers = new ArrayList<>();
     }

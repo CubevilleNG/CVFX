@@ -72,6 +72,6 @@ public class InteractHookTargetEntity implements InteractHook
         return false;
     }
 
-    public void playAt(Location location, int stopAt) {}
-    public void playFor(Player player, int stopAt) {}
+    public void playAt(Location location, int stopAt, String group) {}
+    public void playFor(Player player, int stopAt, String group) {}
 }

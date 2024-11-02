@@ -57,9 +57,11 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
     private int repeatCount; // 0 = indefinitely, not recommended though
     private int repeatOffset;
 
+    private List<Effect> cleanupEffects;
+
     public ParticleEffect(String name) {
         setName(name);
-        stepsLoop = 1;
+        stepsLoop = 10;
         repeatCount = 1;
     }
 
@@ -69,6 +71,8 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         repeatCount = (int) config.get("repeatCount");
         repeatOffset = (int) config.get("repeatOffset");
         components = (List<ParticleEffectComponent>) config.get("components");
+        if(config.get("cleanupEffects") != null)
+            cleanupEffects = (List<Effect>) config.get("cleanupEffects");
     }
 
     public Map<String, Object> serialize() {
@@ -77,6 +81,8 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         ret.put("repeatCount", repeatCount);
         ret.put("repeatOffset", repeatOffset);
         ret.put("components", components);
+        if(cleanupEffects != null)
+            ret.put("cleanupEffects", cleanupEffects);
         return ret;
     }
 
@@ -150,14 +156,24 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
     }
 
     public void abort(int id) {
-        removeArmorStandsForId(id);
-        removeDisplayEntitiesForId(id);
+        cleanup(id);
     }
 
+    public void cleanup(int id) {
+        removeArmorStandsForId(id);
+        removeDisplayEntitiesForId(id);
+        if(cleanupEffects != null) {
+            for(Effect effect: cleanupEffects) {
+                if(effect instanceof EffectWithLocation) {
+                    ((EffectWithLocation) effect).play(null);
+                }
+            }
+        }
+    }
+    
     public boolean play(int step, ParticleEffectLocationCalculator locationCalculator, Player player, int id) {
         if(!hasStep(step)) {
-            removeArmorStandsForId(id);
-            removeDisplayEntitiesForId(id);
+            cleanup(id);
             return false;
         }
 
@@ -255,10 +271,14 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                             }
 
                             if(entity.getType() == EntityType.TEXT_DISPLAY) {
-                                ((TextDisplay) entity).setBackgroundColor(Color.fromARGB((int) properties.textBackgroundAlpha.getValue(effectStep),
-                                                                                         (int) properties.textBackgroundRed.getValue(effectStep),
-                                                                                         (int) properties.textBackgroundGreen.getValue(effectStep),
-                                                                                         (int) properties.textBackgroundBlue.getValue(effectStep)));
+                                ((TextDisplay) entity).setBackgroundColor(Color.fromARGB((int) properties.textBackgroundAlpha.getValue(localStep),
+                                                                                         (int) properties.textBackgroundRed.getValue(localStep),
+                                                                                         (int) properties.textBackgroundGreen.getValue(localStep),
+                                                                                         (int) properties.textBackgroundBlue.getValue(localStep)));
+                                int o = (int) properties.textOpacity.getValue(localStep);
+                                if(o < 10) o = 10;
+                                if(o > 255) o = 255;
+                                ((TextDisplay) entity).setTextOpacity((byte) o);
                             }
                             
                             org.joml.Vector3f translation =
@@ -453,7 +473,8 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                             double speed = (double) component.getSpeed().getValue(effectStep);
                             
                             if(component.getParticle() == Particle.DUST ||
-                               component.getParticle() == Particle.DUST_COLOR_TRANSITION) {
+                               component.getParticle() == Particle.DUST_COLOR_TRANSITION ||
+                               component.getParticle() == Particle.ENTITY_EFFECT) {
                                 
                                 int red = (int) (Math.round(component.getColourRed().getValue(effectStep) * 255));
                                 if(red < 0) red = 0;
@@ -466,24 +487,31 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                 if(blue > 255) blue = 255;
                                 float size = (float) component.getSize().getValue(effectStep);
 
-                                Particle.DustOptions dustoptions;
-                                if(component.getParticle() == Particle.DUST_COLOR_TRANSITION) {
-                                    int tored = (int) (Math.round(component.getColourToRed().getValue(effectStep) * 255));
-                                    if(tored < 0) tored = 0;
-                                    if(tored > 255) tored = 255;
-                                    int togreen = (int) (Math.round(component.getColourToGreen().getValue(effectStep) * 255));
-                                    if(togreen < 0) togreen = 0;
-                                    if(togreen > 255) togreen = 255;
-                                    int toblue = (int) (Math.round(component.getColourToBlue().getValue(effectStep) * 255));
-                                    if(toblue < 0) toblue = 0;
-                                    if(toblue > 255) toblue = 255;
-                                    dustoptions = new Particle.DustTransition(Color.fromRGB(red, green, blue), Color.fromRGB(tored, togreen, toblue), size);
+                                if(component.getParticle() == Particle.ENTITY_EFFECT) {
+                                    nloc.getWorld().spawnParticle(component.getParticle(), nloc.getX(), nloc.getY(), nloc.getZ(), (int)(component.getCount().getValue(effectStep)),
+                                                                  spread.getX(), spread.getY(), spread.getZ(), speed, Color.fromRGB(red, green, blue));
                                 }
-                                else 
-                                    dustoptions = new Particle.DustOptions(Color.fromRGB(red, green, blue), size);
-                                
-                                nloc.getWorld().spawnParticle(component.getParticle(), nloc.getX(), nloc.getY(), nloc.getZ(), (int)(component.getCount().getValue(effectStep)),
-                                                              spread.getX(), spread.getY(), spread.getZ(), speed, dustoptions);
+
+                                else {
+                                    Particle.DustOptions dustoptions;
+                                    if(component.getParticle() == Particle.DUST_COLOR_TRANSITION) {
+                                        int tored = (int) (Math.round(component.getColourToRed().getValue(effectStep) * 255));
+                                        if(tored < 0) tored = 0;
+                                        if(tored > 255) tored = 255;
+                                        int togreen = (int) (Math.round(component.getColourToGreen().getValue(effectStep) * 255));
+                                        if(togreen < 0) togreen = 0;
+                                        if(togreen > 255) togreen = 255;
+                                        int toblue = (int) (Math.round(component.getColourToBlue().getValue(effectStep) * 255));
+                                        if(toblue < 0) toblue = 0;
+                                        if(toblue > 255) toblue = 255;
+                                        dustoptions = new Particle.DustTransition(Color.fromRGB(red, green, blue), Color.fromRGB(tored, togreen, toblue), size);
+                                    }
+                                    else 
+                                        dustoptions = new Particle.DustOptions(Color.fromRGB(red, green, blue), size);
+                                    
+                                    nloc.getWorld().spawnParticle(component.getParticle(), nloc.getX(), nloc.getY(), nloc.getZ(), (int)(component.getCount().getValue(effectStep)),
+                                                                  spread.getX(), spread.getY(), spread.getZ(), speed, dustoptions);
+                                }
                             }
 
                             else if(component.getParticle() == Particle.ITEM) {
@@ -521,8 +549,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         }
 
         if(hasNextStep == false) {
-            removeArmorStandsForId(id);
-            removeDisplayEntitiesForId(id);
+            cleanup(id);
         }
 
         return hasNextStep;
@@ -570,6 +597,13 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
             ret.add("§6* Component: " + count + "§r");
             ret.addAll(component.getInfo(detailed));
         }
+
+        if(cleanupEffects != null) {
+            ret.add("&6Cleanup effects:");
+            for(Effect effect: cleanupEffects)
+                ret.add("- " + effect.getName());
+        }
+        
         return ret;
     }
 
@@ -585,6 +619,14 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         this.stepsLoop = argStepsLoop;
     }
 
+    public final void setDuration(final int argDuration) {
+        stepsLoop = argDuration;
+    }
+
+    public final int getDuration() {
+        return stepsLoop;
+    }
+    
     public final int getRepeatCount() {
         return this.repeatCount;
     }
@@ -636,5 +678,17 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                 }
             }
         }
+    }
+
+    public void addCleanupEffect(Effect effect) {
+        if(cleanupEffects == null)
+            cleanupEffects = new ArrayList<>();
+        cleanupEffects.add(effect);
+    }
+
+    public void removeCleanupEffect(int index) {
+        cleanupEffects.remove(index);
+        if(cleanupEffects.size() == 0)
+            cleanupEffects = null;
     }
 }

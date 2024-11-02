@@ -33,6 +33,7 @@ public class NPCEffect extends EffectWithLocation
 
     public NPCEffect(Map<String, Object> config) {
         setName((String) config.get("name"));
+        npcId = (int) config.get("npcId");
         spawn = (boolean) config.get("spawn");
         if(spawn)
             spawnLocation = (Location) config.get("spawnLocation");
@@ -44,6 +45,7 @@ public class NPCEffect extends EffectWithLocation
 
     public Map<String, Object> serialize() {
         Map<String, Object> ret = getSerializationBase();
+        ret.put("npcId", npcId);
         ret.put("spawn", spawn);
         if(spawn)
             ret.put("spawnLocation", spawnLocation);
@@ -73,10 +75,9 @@ public class NPCEffect extends EffectWithLocation
     public void setEquipment(EquipmentSlot slot, ItemStack item) {
         if(item == null) {
             if(equipment != null) {
-                if(equipment.keySet().size() == 1)
+                equipment.remove(slot.toString());
+                if(equipment.keySet().size() == 0)
                     equipment = null;
-                else
-                    equipment.remove(slot.toString());
             }
         }
         else {

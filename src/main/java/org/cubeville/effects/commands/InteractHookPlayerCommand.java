@@ -10,11 +10,11 @@ import org.bukkit.util.Vector;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
+import org.cubeville.commons.commands.CommandParameterString;
 import org.cubeville.commons.commands.CommandParameterInteger;
 import org.cubeville.commons.commands.CommandParameterWorld;
 import org.cubeville.commons.commands.BaseCommand;
 import org.cubeville.commons.commands.CommandExecutionException;
-import org.cubeville.commons.commands.CommandParameterString;
 import org.cubeville.commons.commands.CommandParameterVector;
 import org.cubeville.commons.commands.CommandParameterFloat;
 import org.cubeville.commons.commands.CommandResponse;
@@ -33,6 +33,7 @@ public class InteractHookPlayerCommand extends BaseCommand
         addBaseParameter(new CommandParameterFloat());
         addParameter("stopat", true, new CommandParameterInteger());
         addFlag("silent");
+        addParameter("group", true, new CommandParameterString());
     }
 
     public CommandResponse execute(CommandSender player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
@@ -47,8 +48,12 @@ public class InteractHookPlayerCommand extends BaseCommand
         if(parameters.containsKey("stopat"))
             stopat = (int) parameters.get("stopat");
 
+        String group = null;
+        if(parameters.containsKey("group"))
+            group = (String) parameters.get("group");
+        
         for(InteractHook hook: hooks) {
-            hook.playAt(location, stopat);
+            hook.playAt(location, stopat, group);
         }
 
         if(flags.contains("silent"))

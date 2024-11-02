@@ -13,30 +13,37 @@ import org.bukkit.event.Event;
 public class CommandWithLivingEntityEffect extends EffectWithLivingEntity
 {
     private String command;
+    private boolean runAsEntity;
     
-    public CommandWithLivingEntityEffect(String name, String command) {
+    public CommandWithLivingEntityEffect(String name, String command, boolean runAsEntity) {
         setName(name);
         this.command = command;
+        this.runAsEntity = runAsEntity;
     }
 
     public CommandWithLivingEntityEffect(Map<String, Object> config) {
         command = (String) config.get("command");
         setName((String) config.get("name"));
+        if(config.get("runAsEntity") == null)
+            runAsEntity = false;
+        else
+            runAsEntity = (boolean) config.get("runAsEntity");
     }
 
     public Map<String, Object> serialize() {
         Map<String, Object> ret = getSerializationBase();
         ret.put("command", command);
+        ret.put("runAsEntity", runAsEntity);
         return ret;
     }
 
     public void play(LivingEntity entity, Event event) {
-        String c = command;        
+        String c = command;
         if(c.contains("%player%") && (entity instanceof Player)) {
             Player p = (Player) entity;
             c = c.replace("%player%", p.getName());
         }
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), c);
+        Bukkit.dispatchCommand(runAsEntity ? entity : Bukkit.getConsoleSender(), c);
     }
 
     public List<String> getInfo(boolean detailed, String limit) {

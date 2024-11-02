@@ -37,6 +37,9 @@ public class ParticleCommandHelper
         command.addParameter("particle", true, new CommandParameterEnumOrNull(Particle.class, "none"));
         command.addParameter("externaleffect", true, new CommandParameterString());
 
+        command.addParameter("cleanup+", true, new CommandParameterString());
+        command.addParameter("cleanup-", true, new CommandParameterInteger());
+        
         command.addParameter("armorstandactive", true, new CommandParameterBoolean());
         command.addParameter("armorstandrotation", true, new CommandParameterValueSource());
         command.addParameter("armorstandheadposex", true, new CommandParameterValueSource());
@@ -69,12 +72,14 @@ public class ParticleCommandHelper
 
         command.addFlag("itemdisplay");
         command.addParameter("additemdisplay", true, new CommandParameterInteger());
+        command.addParameter("additemanim", true, new CommandParameterListInteger(2));
         command.addParameter("textdisplay", true, new CommandParameterString());
         command.addParameter("addtextdisplay", true, new CommandParameterString());
         command.addParameter("textbgalpha", true, new CommandParameterValueSource());
         command.addParameter("textbgred", true, new CommandParameterValueSource());
         command.addParameter("textbggreen", true, new CommandParameterValueSource());
         command.addParameter("textbgblue", true, new CommandParameterValueSource());
+        command.addParameter("textopacity", true, new CommandParameterValueSource());
         command.addParameter("displaymovex", true, new CommandParameterValueSource());
         command.addParameter("displaymovey", true, new CommandParameterValueSource());
         command.addParameter("displaymovez", true, new CommandParameterValueSource());
@@ -117,10 +122,9 @@ public class ParticleCommandHelper
         {
             List<CommandParameterType> pl = new ArrayList<>();
             pl.add(new CommandParameterValueSource());
-            pl.add(new CommandParameterBoolean());
-            pl.add(new CommandParameterBoolean());
-            pl.add(new CommandParameterBoolean());
+            pl.add(new CommandParameterString());
             command.addParameter("move+", true, new CommandParameterList(pl));
+            command.addParameter("move", true, new CommandParameterList(pl));
         }
         {
             List<CommandParameterType> pl = new ArrayList<>();
@@ -129,6 +133,7 @@ public class ParticleCommandHelper
             command.addParameter("advrotate+", true, new CommandParameterList(pl));
         }
         command.addParameter("scale+", true, new CommandParameterValueSource());
+        command.addParameter("scale", true, new CommandParameterValueSource());
         {
             List<CommandParameterType> pl = new ArrayList<>();
             pl.add(new CommandParameterValueSource());
@@ -161,12 +166,23 @@ public class ParticleCommandHelper
         if(parameters.containsKey("duration")) effect.setStepsLoop((int) parameters.get("duration"));
         if(parameters.containsKey("repeat")) effect.setRepeatCount((int) parameters.get("repeat"));
         if(parameters.containsKey("repeatoffset")) effect.setRepeatOffset((int) parameters.get("repeatoffset"));
+        if(parameters.containsKey("cleanup+")) {
+            String effectName = (String) parameters.get("cleanup+");
+            Effect ceffect = EffectManager.getInstance().getEffectByName(effectName);
+            if(ceffect == null)
+                throw new IllegalArgumentException("Cleanup effect name not found!");
+            effect.addCleanupEffect(ceffect);
+        }
+
+        if(parameters.containsKey("cleanup-")) { // TODO: Check if index is valid
+            effect.removeCleanupEffect((int) parameters.get("cleanup-") - 1);
+        }
     }
 
     public static boolean hasOnlyEffectValues(Map<String, Object> parameters, Set<String> flags) {
         if(flags.size() > 0) return false;
         for(String key: parameters.keySet()) {
-            if(! (key.equals("duration") || key.equals("repeat") || key.equals("repeatoffset")))
+            if(! (key.equals("duration") || key.equals("repeat") || key.equals("repeatoffset") || key.equals("cleanup+") || key.equals("cleanup-")))
                 return false;
         }
         return true;
@@ -293,12 +309,8 @@ public class ParticleCommandHelper
             }
             else {
                 Effect effect = EffectManager.getInstance().getEffectByName(name);
-                if(effect == null) {
-                    throw new IllegalArgumentException("External effect name not found.");
-                }
-                else if(!(effect instanceof EffectWithLocation)) {
-                    throw new IllegalArgumentException("Only location-based effects can be used as external effect.");
-                }
+                if(effect == null) throw new IllegalArgumentException("External effect name not found.");
+                else if(!(effect instanceof EffectWithLocation)) throw new IllegalArgumentException("Only location-based effects can be used as external effect.");
                 component.setExternalEffect(name, effect);
             }
         }
@@ -317,6 +329,18 @@ public class ParticleCommandHelper
             ItemStack item = player.getInventory().getItemInMainHand();
             int startStep = (int) parameters.get("additemdisplay");
             component.createOrGetDisplayEntityProperties().addItemData(item, startStep);
+        }
+
+        if(parameters.containsKey("additemanim")) {
+            List<Integer> pars = (List<Integer>) parameters.get("additemanim");
+            int itemcount = pars.get(0);
+            int interval = pars.get(1);
+            component.createOrGetDisplayEntityProperties().setItemData(player.getInventory().getItem(0));
+            int duration = parent.getDuration();
+            int itemno = 0;
+            for(int i = interval; i < duration; i += interval) {
+                component.createOrGetDisplayEntityProperties().addItemData(player.getInventory().getItem(++itemno % itemcount), i); // TODO reusing items would be better
+            }
         }
         
         if(parameters.containsKey("textdisplay")) {
@@ -340,6 +364,8 @@ public class ParticleCommandHelper
             component.createOrGetDisplayEntityProperties().textBackgroundGreen = (ValueSource) parameters.get("textbggreen");
         if(parameters.containsKey("textbgblue"))
             component.createOrGetDisplayEntityProperties().textBackgroundBlue = (ValueSource) parameters.get("textbgblue");
+        if(parameters.containsKey("textopacity"))
+            component.createOrGetDisplayEntityProperties().textOpacity = (ValueSource) parameters.get("textopacity");
 
         if(parameters.containsKey("displaymovex"))
             component.createOrGetDisplayEntityProperties().moveX = (ValueSource) parameters.get("displaymovex");
@@ -484,20 +510,29 @@ public class ParticleCommandHelper
             component.addModifier(modifier);
         }
 
-        if(parameters.containsKey("move+")) {
-            List<Object> pars = (List<Object>) parameters.get("move+");
+        if(parameters.containsKey("move+") || parameters.containsKey("move")) {
+            boolean add = parameters.containsKey("move+");
+            List<Object> pars = (List<Object>) parameters.get(add ? "move+" : "move");
+            String directions = (String) pars.get(1);
+            boolean x = directions.indexOf('x') >= 0;
+            boolean y = directions.indexOf('y') >= 0;
+            boolean z = directions.indexOf('z') >= 0;
             CoordinateModifierMove modifier =
-                new CoordinateModifierMove((ValueSource) pars.get(0),
-                                           (Boolean) pars.get(1),
-                                           (Boolean) pars.get(2),
-                                           (Boolean) pars.get(3));
-            component.addModifier(modifier);
+                new CoordinateModifierMove((ValueSource) pars.get(0), x, y, z);
+            if(add)
+                component.addModifier(modifier);
+            else
+                component.replaceOrAddModifier(modifier);
         }
 
-        if(parameters.containsKey("scale+")) {
+        if(parameters.containsKey("scale+") || parameters.containsKey("scale")) {
+            boolean add = parameters.containsKey("scale+");
             CoordinateModifierScale modifier =
-                new CoordinateModifierScale((ValueSource) parameters.get("scale+"));
-            component.addModifier(modifier);
+                new CoordinateModifierScale((ValueSource) parameters.get(add ? "scale+" : "scale"));
+            if(add)
+                component.addModifier(modifier);
+            else
+                component.replaceOrAddModifier(modifier);
         }
 
         if(parameters.containsKey("scale2d+")) {

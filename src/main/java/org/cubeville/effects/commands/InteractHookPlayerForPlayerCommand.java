@@ -40,7 +40,7 @@ public class InteractHookPlayerForPlayerCommand extends BaseCommand
             stopat = (int) parameters.get("stopat");
 
         for(InteractHook hook: hooks) {
-            hook.playFor(forPlayer, stopat);
+            hook.playFor(forPlayer, stopat, null);
         }
 
         if(flags.contains("silent"))

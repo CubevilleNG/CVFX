@@ -32,7 +32,7 @@ public class EffectModifyParticleCommand extends Command {
         ParticleCommandHelper.setEffectValues(effect, parameters);
 
         List<Integer> componentIdx = (List<Integer>) parameters.get("component");
-        if(componentIdx == null && effect.getComponents().size() > 1 && ParticleCommandHelper.hasOnlyEffectValues(parameters, flags) == false) throw new CommandExecutionException("Component index madatory for effect with more than one component!");
+        if(componentIdx == null && effect.getComponents().size() > 1 && ParticleCommandHelper.hasOnlyEffectValues(parameters, flags) == false) throw new CommandExecutionException("Component index mandatory for effect with more than one component!");
 
         if(componentIdx == null) {
             componentIdx = new ArrayList<>();

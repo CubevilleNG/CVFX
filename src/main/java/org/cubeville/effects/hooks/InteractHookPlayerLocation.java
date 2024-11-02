@@ -55,11 +55,11 @@ public class InteractHookPlayerLocation implements InteractHook
 
     public boolean process(PlayerInteractEvent event) {
         Location loc = event.getPlayer().getLocation();
-        playAt(loc, 0);
+        playAt(loc, 0, null);
         return true;
     }
 
-    public void playAt(Location location, int stopAt) {
+    public void playAt(Location location, int stopAt, String group) {
         Location loc = location.clone();
         if(fixedPitch) loc.setPitch(0);
         loc.setY(loc.getY() + yoffset);
@@ -67,8 +67,8 @@ public class InteractHookPlayerLocation implements InteractHook
 	effect.play(loc);
     }
 
-    public void playFor(Player player, int stopAt) {
-        playAt(player.getLocation(), stopAt);
+    public void playFor(Player player, int stopAt, String group) {
+        playAt(player.getLocation(), stopAt, group);
     }
     
     public boolean usesEffect(Effect effect) {

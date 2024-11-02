@@ -211,7 +211,14 @@ public class Registry implements ConfigurationSerializable
         List<InteractHook> hooks = interactEvents.get(id).getHooks();
         return hooks;
     }
-    
+
+    public List<ProjectileLaunchHook> getProjectileLaunchHooksOfItem(Integer id) {
+        if(!projectileLaunchEvents.containsKey(id))
+            return null;
+        List<ProjectileLaunchHook> hooks = projectileLaunchEvents.get(id).getHooks();
+        return hooks;
+    }
+
     public void processMoveEvent(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         List<Integer> ids = new ArrayList<>();

@@ -21,7 +21,7 @@ import org.cubeville.effects.managers.sources.value.ValueSource;
 
 public class CommandParameterValueSource implements CommandParameterType
 {
-    // constant(3.0)
+    // constant(3.0), alternatively 3.0
     // linear(1.0,0.01)
     // sinewave(0,36,0.0,1.0,false)
     // random(0.0,10.0)
@@ -74,8 +74,15 @@ public class CommandParameterValueSource implements CommandParameterType
     }
     
     public boolean isValid(String value) {
-        if(!value.endsWith(")")) return false;
-        if(value.indexOf("(") == -1) return false;
+        if(value.endsWith(")") == false || value.indexOf("(") == -1) {
+            try {
+                Double.parseDouble(value);
+                return true;
+            }
+            catch (NumberFormatException e) {
+                return false;
+            }
+        }
         String type = value.substring(0, value.indexOf("("));
         String val = value.substring(value.indexOf("(") + 1, value.length() - 1);
         for(String key: parameterLists.keySet()) {
@@ -91,6 +98,9 @@ public class CommandParameterValueSource implements CommandParameterType
     }
 
     public ValueSource getValue(String value) {
+        if(value.indexOf("(") == -1)
+            return new ConstantValueSource(Double.parseDouble(value));
+        
         String type = value.substring(0, value.indexOf("("));
         String val = value.substring(value.indexOf("(") + 1, value.length() - 1);
         if(type.equals("constant")) {

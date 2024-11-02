@@ -69,4 +69,7 @@ public class CoordinateModifierMove implements CoordinateModifier
 	return "Move " + (x ? "x" : "") + (y ? "y" : "") + (z ? "z" : "") + ": " + source.getInfo(detailed);
     }
 
+    public boolean isSameType(CoordinateModifierMove other) {
+        return x == other.x && y == other.y && z == other.z;
+    }
 }

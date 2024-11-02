@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
-import org.cubeville.commons.commands.Command;
 import org.cubeville.commons.commands.CommandExecutionException;
 import org.cubeville.commons.commands.CommandParameterDouble;
 import org.cubeville.commons.commands.CommandResponse;
@@ -13,7 +12,6 @@ import org.cubeville.effects.hooks.InteractHookParticlePlayer;
 import org.cubeville.effects.managers.Effect;
 import org.cubeville.effects.managers.ParticleEffect;
 import org.cubeville.effects.registry.Registry;
-import org.cubeville.effects.util.ItemUtil;
 
 public class HookCreateInteractParticlePlayerCommand extends HookCommand
 {
@@ -41,6 +39,7 @@ public class HookCreateInteractParticlePlayerCommand extends HookCommand
         if(parameters.get("speed") != null) speed = (double) parameters.get("speed");
         double step = 1.0;
         if(parameters.get("step") != null) step = (double) parameters.get("step");
+        if(step < 0.05) throw new CommandExecutionException("Step parameter must be at least 0.05!");
         double yoffset = 0.0;
         if(parameters.get("yoffset") != null) yoffset = (double) parameters.get("yoffset");
         boolean fixedpitch = parameters.containsKey("fixedpitch");
