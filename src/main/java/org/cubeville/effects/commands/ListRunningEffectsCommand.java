@@ -27,13 +27,19 @@ public class ListRunningEffectsCommand extends BaseCommand
 
         List<ParticleEffectTimedRunnable> l = EffectManager.getInstance().getRunningEffects();
         if(l.size() == 0) throw new CommandExecutionException("No running effects.");
-        
+
         for(ParticleEffectTimedRunnable runnable: l) {
-            String group = runnable.getGroup() == null ? "" : " (" + runnable.getGroup() + ")";
-            response.addMessage(runnable.getId() + ": " + runnable.getEffect().getName() + group);
+            String properties = "";
+            if(runnable.getGroup() != null) properties += "Group: " + runnable.getGroup();
+            if(runnable.getPlayer() != null) {
+                if(properties.length() > 0) properties += ", ";
+                properties += runnable.getPlayer().getDisplayName();
+            }
+            if(properties.length() > 0) properties = " (" + properties + ")";
+            response.addMessage(runnable.getId() + ": " + runnable.getEffect().getName() + properties);
         }
 
         return response;
     }
-    
+
 }

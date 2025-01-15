@@ -1,4 +1,4 @@
-package org.cubeville.effects.managers; // 
+package org.cubeville.effects.managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,7 +126,8 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         if(dm == null) return;
 
         Display entity = dm.remove(timelineNo);
-        removeDisplayEntity(entity);
+        if(entity != null)
+            removeDisplayEntity(entity);
     }
     
     private void removeArmorStandsForId(int id) {
@@ -195,7 +196,11 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                     int effectStep = localStep - component.getEffectOffset(timelineNo);
 
                     Location location = locationCalculator.getLocationForStep(step - component.getLocationOffset(timelineNo));
-                    if(location == null) continue;
+
+                    if(location == null) {
+                        removeDisplayEntityForTimeline(id, componentNo, timelineNo);
+                        continue;
+                    }
 
                     List<Vector> particleLocations = component.getModifiedCoordinates(effectStep, false);
 
@@ -214,9 +219,6 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                 }
                                 displayEntityLocation.add(nvec);
                             }
-
-                            for(CoordinateModifier modifier: component.getModifiers())
-                                displayEntityLocation = modifier.modifyLocation(displayEntityLocation, localStep);
 
                             HashMap<Integer, HashMap<Integer, Display>> m = displayentities.get(id);
                             if(m == null) {

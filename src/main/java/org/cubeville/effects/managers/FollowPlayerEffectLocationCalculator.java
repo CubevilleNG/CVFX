@@ -79,6 +79,12 @@ public class FollowPlayerEffectLocationCalculator implements ParticleEffectLocat
         }
 
         else {
+            if(! player.getLocation().getWorld().getUID().equals(location.getWorld().getUID())) {
+                Location loc = player.getLocation();
+                loc.setX(loc.getX() + 2); // TODO would be nicer to do this like in the initial spawning
+                return loc;
+            }
+            
             if(player.getLocation().distance(location) > 8.0) {
                 startMoveStep = step;
                 startLocation = location.clone();

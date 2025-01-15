@@ -34,6 +34,8 @@ import org.cubeville.effects.util.WorldEditUtils;
 public class ParticleCommandHelper
 {
     public static void addCommandParameters(Command command) {
+        command.addParameter("description", true, new CommandParameterString());
+        
         command.addParameter("particle", true, new CommandParameterEnumOrNull(Particle.class, "none"));
         command.addParameter("externaleffect", true, new CommandParameterString());
 
@@ -86,14 +88,14 @@ public class ParticleCommandHelper
         command.addParameter("displayscalex", true, new CommandParameterValueSource());
         command.addParameter("displayscaley", true, new CommandParameterValueSource());
         command.addParameter("displayscalez", true, new CommandParameterValueSource());
-        command.addParameter("displayrotateleftx", true, new CommandParameterValueSource());
-        command.addParameter("displayrotatelefty", true, new CommandParameterValueSource());
-        command.addParameter("displayrotateleftz", true, new CommandParameterValueSource());
-        command.addParameter("displayrotateleftangle", true, new CommandParameterValueSource());
-        command.addParameter("displayrotaterightx", true, new CommandParameterValueSource());
-        command.addParameter("displayrotaterighty", true, new CommandParameterValueSource());
-        command.addParameter("displayrotaterightz", true, new CommandParameterValueSource());
-        command.addParameter("displayrotaterightangle", true, new CommandParameterValueSource());
+        command.addParameter("displaylrotx", true, new CommandParameterValueSource());
+        command.addParameter("displaylroty", true, new CommandParameterValueSource());
+        command.addParameter("displaylrotz", true, new CommandParameterValueSource());
+        command.addParameter("displaylrotangle", true, new CommandParameterValueSource());
+        command.addParameter("displayrrotx", true, new CommandParameterValueSource());
+        command.addParameter("displayrroty", true, new CommandParameterValueSource());
+        command.addParameter("displayrrotz", true, new CommandParameterValueSource());
+        command.addParameter("displayrrotangle", true, new CommandParameterValueSource());
         
         command.addParameter("constantsource", true, new CommandParameterListVector());
         command.addParameter("constantsource+", true, new CommandParameterListVector());
@@ -300,7 +302,9 @@ public class ParticleCommandHelper
                 throw new IllegalArgumentException("Can't scale coordinates, source is not constant!");
             }
         }
-        
+
+        if(parameters.containsKey("description")) component.setDescription((String) parameters.get("description"));
+
         if(parameters.containsKey("particle")) component.setParticle((Particle) parameters.get("particle"));
         if(parameters.containsKey("externaleffect")) {
             String name = (String) parameters.get("externaleffect");

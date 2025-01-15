@@ -52,9 +52,8 @@ public class ProjectileLaunchHookPlayerEffect extends EffectWithLocation
 
         Projectile projectile = CommandUtil.launchProjectile(location, direction, speed, snowball);
 
-        for(ProjectileLaunchHook hook: hooks) {
+        for(ProjectileLaunchHook hook: hooks)
             hook.runAt(location, projectile);
-        }
     }
 
     public List<String> getInfo(boolean detailed, String limit) {

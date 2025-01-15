@@ -23,14 +23,16 @@ public class InteractHookParticlePlayer implements InteractHook
     private double speed;
     private boolean fixedPitch;
     private double pitch;
+    private double yawOffset;
     private boolean followPlayerLocation;
     private boolean followPlayerYaw;
     private boolean followPlayerPitch;
     private boolean followPlayer;
     private boolean disableWhenMoving;
     private boolean disableWhenStill;
+    private boolean playerExclusive;
     
-    public InteractHookParticlePlayer(String effectName, double yOffset, double stepsPerTick, double speed, boolean fixedPitch, double pitch, double ySneakShift, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, boolean followPlayer) {
+    public InteractHookParticlePlayer(String effectName, double yOffset, double yawOffset, double stepsPerTick, double speed, boolean fixedPitch, double pitch, double ySneakShift, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, boolean followPlayer, boolean playerExclusive) {
 	this.effect = (ParticleEffect) EffectManager.getInstance().getEffectByName(effectName);
 	this.yOffset = yOffset;
 	this.stepsPerTick = stepsPerTick;
@@ -44,6 +46,8 @@ public class InteractHookParticlePlayer implements InteractHook
         this.disableWhenMoving = disableWhenMoving;
         this.disableWhenStill = disableWhenStill;
         this.followPlayer = followPlayer;
+        this.yawOffset = yawOffset;
+        this.playerExclusive = playerExclusive;
     }
 
     public InteractHookParticlePlayer(Map<String, Object> config) {
@@ -74,6 +78,14 @@ public class InteractHookParticlePlayer implements InteractHook
             followPlayer = (boolean) config.get("followPlayer");
         else
             followPlayer = false;
+        if(config.get("yawOffset") != null)
+            yawOffset = (double) config.get("yawOffset");
+        else
+            yawOffset = 0.0;
+        if(config.get("playerExclusive") != null)
+            playerExclusive = (boolean) config.get("playerExclusive");
+        else
+            playerExclusive = false;
     }
     
     public Map<String, Object> serialize() {
@@ -91,6 +103,8 @@ public class InteractHookParticlePlayer implements InteractHook
         ret.put("disableWhenMoving", disableWhenMoving);
         ret.put("disableWhenStill", disableWhenStill);
         ret.put("followPlayer", followPlayer);
+        ret.put("yawOffset", yawOffset);
+        ret.put("playerExclusive", playerExclusive);
         return ret;
     }
 
@@ -98,6 +112,7 @@ public class InteractHookParticlePlayer implements InteractHook
         String info = "ParticlePlayer: " + effect.getName();
         if(fixedPitch) info += ", fp = " + pitch;
         if(yOffset != 0.0) info += ", yo = " + yOffset;
+        if(yawOffset != 0.0) info += ", yawo = " + yawOffset;
         if(ySneakShift != 0.0) info += ", sys = " + ySneakShift;
         if(stepsPerTick != 1.0) info += ", steps = " + stepsPerTick;
         if(speed != 1.0) info += ", speed = " + speed;
@@ -107,6 +122,7 @@ public class InteractHookParticlePlayer implements InteractHook
         if(followPlayerPitch) info += ", fpp";
         if(disableWhenMoving) info += ", dwm";
         if(disableWhenStill) info += ", dws";
+        if(playerExclusive) info += ", pex";
         return info;
     }
     
@@ -118,17 +134,24 @@ public class InteractHookParticlePlayer implements InteractHook
     }
 
     public void playFor(Player player, int stopAt, String group) {
-	Location loc = player.getLocation().clone();
+
+        if(playerExclusive) EffectManager.getInstance().abortRunningEffects(player, effect);
+
+        Location loc = player.getLocation().clone();
 	loc.setY(loc.getY() + yOffset);
+        loc.setYaw(loc.getYaw() + (float)yawOffset);
         if(player.isSneaking()) loc.setY(loc.getY() + ySneakShift);
 	if(fixedPitch) loc.setPitch((float)pitch);
+
 	new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill, stopAt, followPlayer, 0, group).runTaskTimer(Effects.getInstance(), 1, 1);
+        
     }
     
     public void playAt(Location location, int stopAt, String group) {
         Location loc = location.clone();
         loc.setY(loc.getY() + yOffset);
         if(fixedPitch) loc.setPitch((float)pitch);
+        loc.setYaw(loc.getYaw() + (float)yawOffset);
 	new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopAt, false, 0, group).runTaskTimer(Effects.getInstance(), 1, 1);
     }
 

@@ -20,6 +20,8 @@ import org.cubeville.effects.managers.sources.value.ValueSource;
 @SerializableAs("ParticleEffectComponent")
 public class ParticleEffectComponent implements ConfigurationSerializable
 {
+    private String description;
+    
     private CoordinateSource coordinates;
 
     private Particle particle;
@@ -142,6 +144,8 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         if(config.get("displayEntityProperties") != null) {
             displayEntityProperties = (DisplayEntityProperties) config.get("displayEntityProperties");
         }
+
+        description = (String) config.get("description");
     }
 
     public Map<String, Object> serialize() {
@@ -170,6 +174,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
             ret.put("externalEffectName", externalEffectName);
         ret.put("armorStandProperties", armorStandProperties);
         ret.put("displayEntityProperties", displayEntityProperties);
+        if(description != null) ret.put("description", description);
 	return ret;
     }
 
@@ -241,6 +246,9 @@ public class ParticleEffectComponent implements ConfigurationSerializable
 
     public List<String> getInfo(boolean detailed) {
 	List<String> ret = new ArrayList<>();
+
+        if(description != null) ret.add("&e  Description: &a" + description);
+
 	ret.add("  Source: " + coordinates.getInfo(detailed));
 
         if(externalEffectName != null) {
@@ -663,4 +671,12 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         ConstantValueSource cvs = (ConstantValueSource) valueSource;
         return cvs.getValue(0) <= 0.00001 && cvs.getValue(0) >= -0.00001;
     }
+
+    public final void setDescription(String description) {
+        if(description != null && description.length() == 0)
+            this.description = null;
+        else
+            this.description = description;
+    }
+
 }

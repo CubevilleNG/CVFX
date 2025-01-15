@@ -207,6 +207,7 @@ public class Effects extends JavaPlugin {
         commandParser.addCommand(new EffectModifyPotionEffectCommand());
         commandParser.addCommand(new EffectModifySoundCommand());
         commandParser.addCommand(new EffectPlayCommand());
+        commandParser.addCommand(new EffectPlayForPlayerCommand());
         commandParser.addCommand(new EffectRemove());
         commandParser.addCommand(new EffectRemovecomponent());
         commandParser.addCommand(new EffectSave(getDataFolder() + "/clipboard/"));

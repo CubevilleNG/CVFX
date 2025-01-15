@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 
+import org.cubeville.commons.commands.CommandParameterDouble;
 import org.cubeville.commons.commands.Command;
 import org.cubeville.commons.commands.CommandExecutionException;
 import org.cubeville.commons.commands.CommandParameterInteger;
@@ -20,6 +21,7 @@ public class EffectCreateProjectileLaunchHookPlayerCommand extends Command
         super("effect create projectilelaunchhookplayer");
         addBaseParameter(new CommandParameterString());
         addBaseParameter(new CommandParameterInteger());
+        addBaseParameter(new CommandParameterDouble());
         addFlag("snowball");
     }
 

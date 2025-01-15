@@ -20,7 +20,7 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
     private final int stopAt;
     private int runIndefinitely;
     private String group;
-    
+
     public ParticleEffectTimedRunnable(JavaPlugin plugin, Player player, ParticleEffect effect, double stepsPerTick, double speed, Location location, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, int stopAt, boolean followPlayerLocationCalculator, int runIndefinitely, String group)
     {
         runningEffectId = EffectManager.getInstance().getNewRunningEffectId();
@@ -43,7 +43,7 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
     public int getId() {
         return runningEffectId;
     }
-    
+
     public Effect getEffect() {
         return effect;
     }
@@ -54,6 +54,10 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
         this.cancel();
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+    
     @Override
     public void run() {
 
@@ -79,7 +83,7 @@ public class ParticleEffectTimedRunnable extends BukkitRunnable
                 ticks = 0;
                 return;
             }
-            
+
         }
     }
 

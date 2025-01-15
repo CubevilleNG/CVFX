@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.entity.Player;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 
@@ -16,7 +17,7 @@ public class EffectManager implements ConfigurationSerializable
     static EffectManager instance;
     private int runningEffectId = 0;
     List<ParticleEffectTimedRunnable> runningEffects = new ArrayList<>();
-    
+
     public static EffectManager getInstance() {
         return instance;
     }
@@ -35,6 +36,16 @@ public class EffectManager implements ConfigurationSerializable
 
     public List<ParticleEffectTimedRunnable> getRunningEffects() {
         return runningEffects;
+    }
+
+    public void abortRunningEffects(Player player, ParticleEffect effect) {
+        for(int i = runningEffects.size() - 1; i >= 0; i--) {
+            if(runningEffects.get(i).getPlayer().getUniqueId().equals(player.getUniqueId())) {
+                if(runningEffects.get(i).getEffect().getName().equals(effect.getName())) {
+                    runningEffects.get(i).abort();
+                }
+            }
+        }
     }
 
     public boolean abortRunningEffect(int id) {
