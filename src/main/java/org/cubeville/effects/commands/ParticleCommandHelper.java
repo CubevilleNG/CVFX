@@ -384,21 +384,21 @@ public class ParticleCommandHelper
         if(parameters.containsKey("displayscalez"))
             component.createOrGetDisplayEntityProperties().scaleZ = (ValueSource) parameters.get("displayscalez");
         if(parameters.containsKey("displaylrotx"))
-            component.createOrGetDisplayEntityProperties().rotateLeftX = (ValueSource) parameters.get("displayrotateleftx");
+            component.createOrGetDisplayEntityProperties().rotateLeftX = (ValueSource) parameters.get("displaylrotx");
         if(parameters.containsKey("displaylroty"))
-            component.createOrGetDisplayEntityProperties().rotateLeftY = (ValueSource) parameters.get("displayrotatelefty");
+            component.createOrGetDisplayEntityProperties().rotateLeftY = (ValueSource) parameters.get("displaylroty");
         if(parameters.containsKey("displaylrotz"))
-            component.createOrGetDisplayEntityProperties().rotateLeftZ = (ValueSource) parameters.get("displayrotateleftz");
+            component.createOrGetDisplayEntityProperties().rotateLeftZ = (ValueSource) parameters.get("displaylrotz");
         if(parameters.containsKey("displaylrotangle"))
-            component.createOrGetDisplayEntityProperties().rotateLeftAngle = (ValueSource) parameters.get("displayrotateleftangle");
+            component.createOrGetDisplayEntityProperties().rotateLeftAngle = (ValueSource) parameters.get("displaylrotangle");
         if(parameters.containsKey("displayrrotx"))
-            component.createOrGetDisplayEntityProperties().rotateRightX = (ValueSource) parameters.get("displayrotaterightx");
+            component.createOrGetDisplayEntityProperties().rotateRightX = (ValueSource) parameters.get("displayrrotx");
         if(parameters.containsKey("displayrroty"))
-            component.createOrGetDisplayEntityProperties().rotateRightY = (ValueSource) parameters.get("displayrotaterighty");
+            component.createOrGetDisplayEntityProperties().rotateRightY = (ValueSource) parameters.get("displayrroty");
         if(parameters.containsKey("displayrrotz"))
-            component.createOrGetDisplayEntityProperties().rotateRightZ = (ValueSource) parameters.get("displayrotaterightz");
+            component.createOrGetDisplayEntityProperties().rotateRightZ = (ValueSource) parameters.get("displayrrotz");
         if(parameters.containsKey("displayrrotangle"))
-            component.createOrGetDisplayEntityProperties().rotateRightAngle = (ValueSource) parameters.get("displayrotaterightangle");
+            component.createOrGetDisplayEntityProperties().rotateRightAngle = (ValueSource) parameters.get("displayrrotangle");
         
         if(parameters.containsKey("armorstandactive")) {
             if((boolean) parameters.get("armorstandactive")) {

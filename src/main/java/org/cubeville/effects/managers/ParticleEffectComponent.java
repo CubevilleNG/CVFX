@@ -607,7 +607,11 @@ public class ParticleEffectComponent implements ConfigurationSerializable
     }
 
     public final void setExternalEffect(String externalEffectName, Effect externalEffect) {
-        if(externalEffect instanceof EffectWithLocation) {
+        if(externalEffect == null) {
+            this.externalEffectName = null;
+            this.externalEffect = null;
+        }
+        else if(externalEffect instanceof EffectWithLocation) {
             this.externalEffectName = externalEffectName;
             this.externalEffect = (EffectWithLocation) externalEffect;
         }
@@ -618,15 +622,17 @@ public class ParticleEffectComponent implements ConfigurationSerializable
     }
 
     public final void setExternalEffect(Effect externalEffect) {
-        if(externalEffect instanceof EffectWithLocation) {
-            this.externalEffect = (EffectWithLocation) externalEffect;
-        }
-        else if(externalEffect == null) {
+        if(externalEffect == null) {
             this.externalEffect = null;
+            this.externalEffectName = null;
+        }
+        else if(externalEffect instanceof EffectWithLocation) {
+            this.externalEffect = (EffectWithLocation) externalEffect;
+            this.externalEffectName = externalEffect.getName();
         }
         else {
-            this.externalEffectName = null;
             this.externalEffect = null;
+            this.externalEffectName = null;
         }
     }
 
