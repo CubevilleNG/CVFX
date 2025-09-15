@@ -89,7 +89,7 @@ public class ParticlePlayerCommand extends BaseCommand
         if(parameters.containsKey("indefinitely"))
             indefinitely = (int) parameters.get("indefinitely");
 
-        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopat, false, indefinitely, group).runTaskTimer(Effects.getInstance(), 1, 1);
+        new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopat, false, false, indefinitely, group).runTaskTimer(Effects.getInstance(), 1, 1);
 
 	if(flags.contains("silent")) {
 	    return new CommandResponse("");

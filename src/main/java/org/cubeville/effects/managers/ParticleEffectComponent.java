@@ -21,7 +21,7 @@ import org.cubeville.effects.managers.sources.value.ValueSource;
 public class ParticleEffectComponent implements ConfigurationSerializable
 {
     private String description;
-    
+
     private CoordinateSource coordinates;
 
     private Particle particle;
@@ -31,7 +31,7 @@ public class ParticleEffectComponent implements ConfigurationSerializable
 
     private ArmorStandProperties armorStandProperties;
     private DisplayEntityProperties displayEntityProperties;
-    
+
     private ValueSource count;
     private ValueSource spreadX;
     private ValueSource spreadY;
@@ -50,7 +50,11 @@ public class ParticleEffectComponent implements ConfigurationSerializable
     private List<ParticleEffectTimelineEntry> timeline;
     private boolean blockCollisionCheck;
     private boolean entityCollisionCheck;
-    
+
+    private HashMap<Integer, Boolean> randomSelection = new HashMap<>();
+    private int randomProbability; // 0 = always active, >= 1 -> chosen randomly
+    private int randomGroup; // 0 - x -> grouped with other component
+
     public ParticleEffectComponent() {
 	coordinates = new ConstantCoordinateSource();
 	particle = Particle.HAPPY_VILLAGER;
@@ -67,6 +71,8 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         entityCollisionCheck = false;
         armorStandProperties = null;
         displayEntityProperties = null;
+        randomProbability = 0;
+        randomGroup = -1;
     }
 
     public ParticleEffectComponent(Map<String, Object> config) {
@@ -146,6 +152,13 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         }
 
         description = (String) config.get("description");
+
+        if(config.get("randomProbability") != null)
+            randomProbability = (int) config.get("randomProbability");
+        else
+            randomProbability = 0;
+
+        randomGroup = config.get("randomGroup") != null ? (int) config.get("randomGroup") : -1;
     }
 
     public Map<String, Object> serialize() {
@@ -175,6 +188,8 @@ public class ParticleEffectComponent implements ConfigurationSerializable
         ret.put("armorStandProperties", armorStandProperties);
         ret.put("displayEntityProperties", displayEntityProperties);
         if(description != null) ret.put("description", description);
+        ret.put("randomProbability", randomProbability);
+        ret.put("randomGroup", randomGroup);
 	return ret;
     }
 
@@ -248,6 +263,9 @@ public class ParticleEffectComponent implements ConfigurationSerializable
 	List<String> ret = new ArrayList<>();
 
         if(description != null) ret.add("&e  Description: &a" + description);
+
+        if(randomGroup >= 0) ret.add("&e  Randomness coupled to component " + (randomGroup + 1));
+        else if(randomProbability > 0) ret.add("&e  Random probability: " + randomProbability);
 
 	ret.add("  Source: " + coordinates.getInfo(detailed));
 
@@ -685,4 +703,34 @@ public class ParticleEffectComponent implements ConfigurationSerializable
             this.description = description;
     }
 
+    public final boolean isRandomSelection(int id) {
+        if(randomProbability == 0 && randomGroup == -1) return true;
+        Boolean result = randomSelection.get(id);
+        if(result == null) return false;
+        return result;
+    }
+
+    public final void setRandomSelection(int id, boolean selected) {
+        randomSelection.put(id, selected);
+    }
+
+    public final void clearRandomSelection(int id) {
+        randomSelection.remove(id);
+    }
+
+    public final int getRandomProbability() {
+        return randomProbability;
+    }
+
+    public final int getRandomGroup() {
+        return randomGroup;
+    }
+
+    public final void setRandomGroup(int randomGroup) {
+        this.randomGroup = randomGroup;
+    }
+
+    public final void setRandomProbability(int randomProbability) {
+        this.randomProbability = randomProbability;
+    }
 }

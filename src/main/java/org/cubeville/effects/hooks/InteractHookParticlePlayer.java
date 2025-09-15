@@ -28,11 +28,12 @@ public class InteractHookParticlePlayer implements InteractHook
     private boolean followPlayerYaw;
     private boolean followPlayerPitch;
     private boolean followPlayer;
+    private boolean randomSpins;
     private boolean disableWhenMoving;
     private boolean disableWhenStill;
     private boolean playerExclusive;
     
-    public InteractHookParticlePlayer(String effectName, double yOffset, double yawOffset, double stepsPerTick, double speed, boolean fixedPitch, double pitch, double ySneakShift, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, boolean followPlayer, boolean playerExclusive) {
+    public InteractHookParticlePlayer(String effectName, double yOffset, double yawOffset, double stepsPerTick, double speed, boolean fixedPitch, double pitch, double ySneakShift, boolean followPlayerLocation, boolean followPlayerYaw, boolean followPlayerPitch, boolean disableWhenMoving, boolean disableWhenStill, boolean followPlayer, boolean randomSpins, boolean playerExclusive) {
 	this.effect = (ParticleEffect) EffectManager.getInstance().getEffectByName(effectName);
 	this.yOffset = yOffset;
 	this.stepsPerTick = stepsPerTick;
@@ -46,6 +47,7 @@ public class InteractHookParticlePlayer implements InteractHook
         this.disableWhenMoving = disableWhenMoving;
         this.disableWhenStill = disableWhenStill;
         this.followPlayer = followPlayer;
+        this.randomSpins = randomSpins;
         this.yawOffset = yawOffset;
         this.playerExclusive = playerExclusive;
     }
@@ -74,10 +76,17 @@ public class InteractHookParticlePlayer implements InteractHook
             disableWhenStill = (boolean) config.get("disableWhenStill");
         else
             disableWhenStill = false;
+
         if(config.get("followPlayer") != null)
             followPlayer = (boolean) config.get("followPlayer");
         else
             followPlayer = false;
+
+        if(config.get("randomSpins") != null)
+            randomSpins = (boolean) config.get("randomSpins");
+        else
+            randomSpins = true;
+
         if(config.get("yawOffset") != null)
             yawOffset = (double) config.get("yawOffset");
         else
@@ -103,6 +112,7 @@ public class InteractHookParticlePlayer implements InteractHook
         ret.put("disableWhenMoving", disableWhenMoving);
         ret.put("disableWhenStill", disableWhenStill);
         ret.put("followPlayer", followPlayer);
+        ret.put("randomSpins", randomSpins);
         ret.put("yawOffset", yawOffset);
         ret.put("playerExclusive", playerExclusive);
         return ret;
@@ -143,7 +153,7 @@ public class InteractHookParticlePlayer implements InteractHook
         if(player.isSneaking()) loc.setY(loc.getY() + ySneakShift);
 	if(fixedPitch) loc.setPitch((float)pitch);
 
-	new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill, stopAt, followPlayer, 0, group).runTaskTimer(Effects.getInstance(), 1, 1);
+	new ParticleEffectTimedRunnable(Effects.getInstance(), player, effect, stepsPerTick, speed, loc, followPlayerLocation, followPlayerYaw, followPlayerPitch, disableWhenMoving, disableWhenStill, stopAt, followPlayer, randomSpins, 0, group).runTaskTimer(Effects.getInstance(), 1, 1);
         
     }
     
@@ -152,7 +162,7 @@ public class InteractHookParticlePlayer implements InteractHook
         loc.setY(loc.getY() + yOffset);
         if(fixedPitch) loc.setPitch((float)pitch);
         loc.setYaw(loc.getYaw() + (float)yawOffset);
-	new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopAt, false, 0, group).runTaskTimer(Effects.getInstance(), 1, 1);
+	new ParticleEffectTimedRunnable(Effects.getInstance(), null, effect, stepsPerTick, speed, loc, false, false, false, false, false, stopAt, false, false, 0, group).runTaskTimer(Effects.getInstance(), 1, 1);
     }
 
     public boolean usesEffect(Effect effect) {

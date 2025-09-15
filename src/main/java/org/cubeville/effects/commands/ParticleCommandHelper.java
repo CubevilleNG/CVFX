@@ -14,6 +14,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import org.cubeville.commons.commands.BaseCommand;
 import org.cubeville.commons.commands.*;
 import org.cubeville.commons.utils.ColorUtils;
 
@@ -33,7 +34,7 @@ import org.cubeville.effects.util.WorldEditUtils;
 
 public class ParticleCommandHelper
 {
-    public static void addCommandParameters(Command command) {
+    public static void addCommandParameters(BaseCommand command) {
         command.addParameter("description", true, new CommandParameterString());
         
         command.addParameter("particle", true, new CommandParameterEnumOrNull(Particle.class, "none"));
@@ -162,6 +163,8 @@ public class ParticleCommandHelper
         command.addParameter("speed", true, new CommandParameterValueSource());
         command.addParameter("blockcollisioncheck", true, new CommandParameterBoolean());
         command.addParameter("entitycollisioncheck", true, new CommandParameterBoolean());
+        command.addParameter("rgroup", true, new CommandParameterInteger());
+        command.addParameter("rprobability", true, new CommandParameterInteger());
     }
     
     public static void setEffectValues(ParticleEffect effect, Map<String, Object> parameters) {
@@ -629,5 +632,7 @@ public class ParticleCommandHelper
         if(parameters.containsKey("speed"))   component.setSpeed(          (ValueSource) parameters.get("speed")  );
         if(parameters.containsKey("blockcollisioncheck")) component.setBlockCollisionCheck((Boolean) parameters.get("blockcollisioncheck"));
         if(parameters.containsKey("entitycollisioncheck")) component.setEntityCollisionCheck((Boolean) parameters.get("entitycollisioncheck"));
+        if(parameters.containsKey("rgroup")) component.setRandomGroup(((int) parameters.get("rgroup")) - 1);
+        if(parameters.containsKey("rprobability")) component.setRandomProbability((int) parameters.get("rprobability"));
     }
 }

@@ -30,6 +30,7 @@ public class HookCreateInteractParticlePlayerCommand extends HookCommand
         addFlag("disablewhenmoving");
         addFlag("disablewhenstill");
         addFlag("followplayer");
+        addFlag("randomspins");
         addFlag("playerexclusive");
     }
 
@@ -58,7 +59,7 @@ public class HookCreateInteractParticlePlayerCommand extends HookCommand
         double yawOffset = 0.0;
         if(parameters.get("yawoffset") != null) yawOffset = (double) parameters.get("yawoffset");
         
-        Registry.getInstance().registerEvent(id, new InteractHookParticlePlayer(effect.getName(), yoffset, yawOffset, step, speed, fixedpitch, fixedpitchval, ysneakshift, flags.contains("followplayerlocation"), flags.contains("followplayeryaw"), flags.contains("followplayerpitch"), flags.contains("disablewhenmoving"), flags.contains("disablewhenstill"), flags.contains("followplayer"), flags.contains("playerexclusive")));
+        Registry.getInstance().registerEvent(id, new InteractHookParticlePlayer(effect.getName(), yoffset, yawOffset, step, speed, fixedpitch, fixedpitchval, ysneakshift, flags.contains("followplayerlocation"), flags.contains("followplayeryaw"), flags.contains("followplayerpitch"), flags.contains("disablewhenmoving"), flags.contains("disablewhenstill"), flags.contains("followplayer"), flags.contains("randomspins"), flags.contains("playerexclusive")));
         CommandUtil.saveConfig();
 
         return new CommandResponse("Hook created.");

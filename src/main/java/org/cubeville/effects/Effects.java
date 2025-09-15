@@ -190,6 +190,7 @@ public class Effects extends JavaPlugin {
         commandParser.addCommand(new EffectCreateCommandWithLivingEntityCommand());
         commandParser.addCommand(new EffectCreateCommandWithLocationCommand());
         commandParser.addCommand(new EffectCreateInteractHookPlayerCommand());
+        commandParser.addCommand(new EffectCreateMessageCommand());
         commandParser.addCommand(new EffectCreateNPCCommand());
         commandParser.addCommand(new EffectCreateParticleCommand());
         commandParser.addCommand(new EffectCreateProjectileLaunchHookPlayerCommand());

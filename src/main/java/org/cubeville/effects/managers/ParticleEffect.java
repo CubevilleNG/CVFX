@@ -1,6 +1,7 @@
 package org.cubeville.effects.managers;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +40,6 @@ import net.minecraft.world.entity.EntityTypes;
 import org.bukkit.craftbukkit.v1_21_R1.CraftWorld;
 
 import org.cubeville.effects.pluginhook.PluginHookManager;
-import org.cubeville.effects.managers.modifier.CoordinateModifier;
 
 @SerializableAs("ParticleEffect")
 public class ParticleEffect extends EffectWithLocation implements EffectWithHook
@@ -59,6 +59,8 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
 
     private List<Effect> cleanupEffects;
 
+    private static Random random = new Random();
+    
     public ParticleEffect(String name) {
         setName(name);
         stepsLoop = 10;
@@ -84,6 +86,45 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         if(cleanupEffects != null)
             ret.put("cleanupEffects", cleanupEffects);
         return ret;
+    }
+
+    public void calculateRandomSelection(int id)
+    {
+        int probabilitySum = 0;
+        for(ParticleEffectComponent component: components) {
+            if(component.getRandomGroup() == -1 && component.getRandomProbability() != 0) {
+                probabilitySum += component.getRandomProbability();
+            }
+        }
+
+        if(probabilitySum == 0) return;
+        
+        int randomValue = random.nextInt(probabilitySum);
+
+        int chosenComponent = -1;
+        probabilitySum = 0;
+        int componentIndex = 0;
+        for(ParticleEffectComponent component: components) {
+            if(component.getRandomGroup() == -1 && component.getRandomProbability() != 0) {
+                probabilitySum += component.getRandomProbability();
+                if(randomValue < probabilitySum) {
+                    chosenComponent = componentIndex;
+                    break;
+                }
+            }
+            componentIndex++;
+        }
+
+        componentIndex = 0;
+        for(ParticleEffectComponent component: components) {
+            if(component.getRandomGroup() >= 0) {
+                component.setRandomSelection(id, component.getRandomGroup() == chosenComponent);
+            }
+            else if(component.getRandomProbability() > 0) {
+                component.setRandomSelection(id, componentIndex == chosenComponent);
+            }
+            componentIndex++;
+        }
     }
 
     public int getStepsTotal() {
@@ -163,6 +204,9 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
     public void cleanup(int id) {
         removeArmorStandsForId(id);
         removeDisplayEntitiesForId(id);
+        for(ParticleEffectComponent component: components) {
+            component.clearRandomSelection(id);
+        }
         if(cleanupEffects != null) {
             for(Effect effect: cleanupEffects) {
                 if(effect instanceof EffectWithLocation) {
@@ -171,7 +215,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
             }
         }
     }
-    
+
     public boolean play(int step, ParticleEffectLocationCalculator locationCalculator, Player player, int id) {
         if(!hasStep(step)) {
             cleanup(id);
@@ -186,7 +230,7 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
         int componentNo = 0;
 
         for(ParticleEffectComponent component: components) {
-            if(component.isActive(localStep)) {
+            if(component.isActive(localStep) && component.isRandomSelection(id)) {
                 boolean blockCollisionCheck = component.getBlockCollisionCheck();
                 boolean entityCollisionCheck = component.getEntityCollisionCheck();
 

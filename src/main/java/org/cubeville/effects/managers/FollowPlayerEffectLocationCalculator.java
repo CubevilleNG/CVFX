@@ -29,9 +29,13 @@ public class FollowPlayerEffectLocationCalculator implements ParticleEffectLocat
     int lastCalculatedStep = 0;
 
     Random random = new Random();
+
+    boolean randomSpins;
     
-    FollowPlayerEffectLocationCalculator(Player player) {
+    FollowPlayerEffectLocationCalculator(Player player, boolean RandomSpins) {
         this.player = player;
+        this.randomSpins = RandomSpins;
+
         location = player.getLocation();
 
         {
@@ -53,9 +57,9 @@ public class FollowPlayerEffectLocationCalculator implements ParticleEffectLocat
 
     public Location getLocationForStep(int step) {
         if(step <= lastCalculatedStep) return location; // TODO this can happen with timelines actually
-        
+
         lastCalculatedStep = step;
-        
+
         if(moving) {
             if(step - startMoveStep > 100) {
                 pausing = true;
@@ -84,7 +88,7 @@ public class FollowPlayerEffectLocationCalculator implements ParticleEffectLocat
                 loc.setX(loc.getX() + 2); // TODO would be nicer to do this like in the initial spawning
                 return loc;
             }
-            
+
             if(player.getLocation().distance(location) > 8.0) {
                 startMoveStep = step;
                 startLocation = location.clone();
@@ -126,12 +130,14 @@ public class FollowPlayerEffectLocationCalculator implements ParticleEffectLocat
                 if(idleYawTurn > 180.0) idleYawTurn -= 360.0;
                 if(idleYawTurn < -180.0) idleYawTurn += 360.0;
 
-                int rnd = random.nextInt(100);
-                if(rnd < 10) {
-                    if(idleYawTurn <= .1) idleYawTurn += 360.0;
+                if(randomSpins) {
+                    int rnd = random.nextInt(100);
+                    if(rnd < 10) {
+                        if(idleYawTurn <= .1) idleYawTurn += 360.0;
+                    }
+                    else if(rnd < 20 && idleYawTurn >= -.1)
+                        idleYawTurn -= 360.0;
                 }
-                else if(rnd < 20 && idleYawTurn >= -.1)
-                    idleYawTurn -= 360.0;
             }
             else if(ph >= 2 && ph <= 11) {
                 double p = (ph - 1) / 10.0;

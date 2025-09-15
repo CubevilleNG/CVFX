@@ -7,14 +7,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
+
+import org.cubeville.commons.commands.BaseCommand;
 import org.cubeville.commons.commands.CommandParameterListInteger;
-import org.cubeville.commons.commands.Command;
 import org.cubeville.commons.commands.CommandExecutionException;
 import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.managers.ParticleEffect;
 import org.cubeville.effects.managers.ParticleEffectComponent;
 
-public class EffectModifyParticleCommand extends Command {
+public class EffectModifyParticleCommand extends BaseCommand {
 
     public EffectModifyParticleCommand() {
         super("effect modify");
@@ -23,7 +25,7 @@ public class EffectModifyParticleCommand extends Command {
         addParameter("component", true, new CommandParameterListInteger());
     }
 
-    public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters)
+    public CommandResponse execute(CommandSender sender, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters)
         throws CommandExecutionException {
 
         if(parameters.size() == 0 && flags.size() == 0) throw new CommandExecutionException("No modification parameters.");
@@ -58,6 +60,8 @@ public class EffectModifyParticleCommand extends Command {
             }
             ParticleEffectComponent component = effect.getComponents().get(i - 1);
             try {
+                Player player = null;
+                if(sender instanceof Player) player = (Player) sender;
                 ParticleCommandHelper.setComponentValues(component, parameters, flags, player, effect);
             }
             catch(IllegalArgumentException e) {

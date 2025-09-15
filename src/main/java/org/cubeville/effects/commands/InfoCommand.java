@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.entity.Player;
-import org.cubeville.commons.commands.Command;
+import org.bukkit.command.CommandSender;
+
+import org.cubeville.commons.commands.BaseCommand;
 import org.cubeville.commons.commands.CommandExecutionException;
 import org.cubeville.commons.commands.CommandParameterString;
 import org.cubeville.commons.commands.CommandResponse;
 import org.cubeville.effects.managers.EffectManager;
 
-public class InfoCommand extends Command
+public class InfoCommand extends BaseCommand
 {
     public InfoCommand() {
 	super("effect info");
@@ -20,7 +21,7 @@ public class InfoCommand extends Command
         addParameter("limit", true, new CommandParameterString());
     }
 
-    public CommandResponse execute(Player player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
+    public CommandResponse execute(CommandSender player, Set<String> flags, Map<String, Object> parameters, List<Object> baseParameters) throws CommandExecutionException {
         
         String name =(String) baseParameters.get(0);
 
