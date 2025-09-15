@@ -1,8 +1,8 @@
 name: CVFX
 main: org.cubeville.effects.Effects
 author: KipperOrigin, GoalieGuy6, FrediW
-version: 1.21
-api-version: 1.21
+version: 1.21.8
+api-version: 1.21.8
 
 depend: [CVTools]
 softdepend: [CVEntityEdit,Citizens]

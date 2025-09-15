@@ -4,15 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import org.cubeville.commons.commands.Command;
-import org.cubeville.commons.commands.CommandExecutionException;
-import org.cubeville.commons.commands.CommandParameterEnum;
-import org.cubeville.commons.commands.CommandParameterFloat;
-import org.cubeville.commons.commands.CommandParameterInteger;
-import org.cubeville.commons.commands.CommandResponse;
+import org.cubeville.commons.commands.*;
 
 import org.cubeville.effects.managers.SoundEffect;
 
@@ -21,7 +17,7 @@ public class EffectModifySoundCommand extends Command {
     public EffectModifySoundCommand() {
 	super("effect modify");
 	addBaseParameter(new CommandParameterEffect(SoundEffect.class));
-	addBaseParameter(new CommandParameterEnum(Sound.class));
+	addBaseParameter(new CommandParameterRegistry<>(Registry.SOUND_EVENT));
 	addOptionalBaseParameter(new CommandParameterFloat());
         addParameter("delay", true, new CommandParameterInteger());
         addParameter("volume", true, new CommandParameterFloat());
