@@ -9,7 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
+import net.minecraft.world.entity.EntitySpawnReason;
+import org.bukkit.craftbukkit.v1_21_R5.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.World;
 import org.bukkit.inventory.EquipmentSlot;
@@ -36,8 +39,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
-
-import org.bukkit.craftbukkit.v1_21_R1.CraftWorld;
 
 import org.cubeville.effects.pluginhook.PluginHookManager;
 
@@ -393,10 +394,10 @@ public class ParticleEffect extends EffectWithLocation implements EffectWithHook
                                 nbt.a("Invulnerable", (byte) 1);
                                 nbt.a("Marker", (byte) 1);
                                 WorldServer ws = ((CraftWorld)armorStandLocation.getWorld()).getHandle();
-                                Optional<Entity> entity = EntityTypes.a(nbt, ws);
-                                entity.get().b(armorStandLocation.getX(), armorStandLocation.getY(), armorStandLocation.getZ(), armorStandLocation.getYaw(), armorStandLocation.getPitch());
-                                ws.tryAddFreshEntityWithPassengers(entity.get(), CreatureSpawnEvent.SpawnReason.CUSTOM);
-                                as = (ArmorStand)(entity.get().getBukkitEntity());
+                                Entity entity = EntityTypes.a(nbt, ws, EntitySpawnReason.a, Function.identity());
+                                entity.b(armorStandLocation.getX(), armorStandLocation.getY(), armorStandLocation.getZ(), armorStandLocation.getYaw(), armorStandLocation.getPitch());
+                                ws.tryAddFreshEntityWithPassengers(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                                as = (ArmorStand)(entity.getBukkitEntity());
                                 as.setPersistent(false);
                                 
                                 // TODO: Would be nice if we could move these two to nbt too:
